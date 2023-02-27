@@ -8,7 +8,8 @@
 #' @param k number of nearest neighbors.
 #' @useDynLib knnmi _mutual_inf_cc_1d
 #'
-#' @return a double-precision value - mutual information estimation for vectors \code{x} and \code{y}.
+#' @return a double-precision value - mutual information estimation for
+#' vectors \code{x} and \code{y}.
 #' @examples
 #'
 #' x <- c(0.9065555 , 0.08110139, 0.13248763, 0.01142746, 0.07952208,
@@ -36,10 +37,11 @@ mutual_inf_cc_1d <- function(x, y, k=3L){
 #'
 #' Mutual information estimation for continuous case of an NxM matrix.
 #'
-#' Compute conditional mutual information of \code{x} and \code{y}
-#' where \code{x} and \code{y} are both continuous
+#' Compute conditional mutual information of \code{x} and matrix \code{M}
+#' where \code{x} and \code{M} are both continuous
 #' @param x input vector.
-#' @param M input matrix. The number of rows should be equal to the length of vector x
+#' @param M input matrix. The number of rows should be equal to the
+#' length of vector x
 #' @param k number of nearest neighbors.
 #' @useDynLib knnmi _mutual_inf_cc_2d
 #'
@@ -61,6 +63,31 @@ mutual_inf_cc_2d <- function(x, M, k=3L){
   stopifnot( "number of rows in matrix M should be equal to length of x"=
                length(x) == nrow(M) )
   res <- .Call('_mutual_inf_cc_2d', x, M, as.integer(k))
+  res
+
+}
+
+
+
+#'
+#' Mutual information estimation for continuous/descreet case.
+#'
+#' Compute conditional mutual information of \code{x} and \code{y}
+#' where \code{x} is continious vector and \code{y} are descrete
+#' @param x input (continious) vector.
+#' @param y input (descrete) vector. It should have the same length as x.
+#' @param k number of nearest neighbors.
+#' @param use_cc (logical)
+#' @useDynLib knnmi _mutual_inf_cd_1d
+#'
+#' @return a double-precision value - mutual information estimation for
+#' vectors \code{x} and \code{y}.
+#' @export
+mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=TRUE){
+
+  stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  res <- .Call('_mutual_inf_cd_1d', x, as.integer(y),
+               as.integer(k), as.logical(use_cc))
   res
 
 }
