@@ -2,9 +2,9 @@
 % Please edit documentation in R/knnmi.R
 \name{mutual_inf_cc_1d}
 \alias{mutual_inf_cc_1d}
-\title{Mutual information estimation for continuous case.}
+\title{Mutual information estimation for continuous case of 2 vectors.}
 \usage{
-mutual_inf_cc_1d(x, y, k = 3)
+mutual_inf_cc_1d(x, y, k = 3L)
 }
 \arguments{
 \item{x}{input vector.}
@@ -14,7 +14,8 @@ mutual_inf_cc_1d(x, y, k = 3)
 \item{k}{number of nearest neighbors.}
 }
 \value{
-a double-precision value - mutual information estimation for vectors \code{x} and \code{y}.
+a double-precision value - mutual information estimation for
+vectors \code{x} and \code{y}.
 }
 \description{
 Compute conditional mutual information of \code{x} and \code{y}
