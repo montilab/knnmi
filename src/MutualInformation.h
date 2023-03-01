@@ -8,7 +8,7 @@
 #include <eigen3/Eigen/Core>
 
 #include <vector>
-#include "nanoflann.hpp"
+#include "nanoflann.h"
 #include "ChebyshevMetric.h"
 
 
