@@ -70,20 +70,20 @@ mutual_inf_cc_2d <- function(x, M, k=3L){
 
 
 #'
-#' Mutual information estimation for continuous/descreet case.
+#' Mutual information estimation for continuous/discrete case.
 #'
 #' Compute conditional mutual information of \code{x} and \code{y}
-#' where \code{x} is continious vector and \code{y} are descrete
-#' @param x input (continious) vector.
-#' @param y input (descrete) vector. It should have the same length as x.
+#' where \code{x} is continuous vector and \code{y} are discrete
+#' @param x input (continuous) vector.
+#' @param y input (discrete) vector. It should have the same length as x.
 #' @param k number of nearest neighbors.
-#' @param use_cc (logical)
+#' @param use_cc (logical) if TRUE the algorithm falls into continuous/continuous case
 #' @useDynLib knnmi _mutual_inf_cd_1d
 #'
 #' @return a double-precision value - mutual information estimation for
 #' vectors \code{x} and \code{y}.
 #' @export
-mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=TRUE){
+mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=FALSE){
 
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   res <- .Call('_mutual_inf_cd_1d', x, as.integer(y),
@@ -91,3 +91,126 @@ mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=TRUE){
   res
 
 }
+
+
+#'
+#' Mutual information estimation for continuous/discrete case.
+#'
+#' Compute conditional mutual information of \code{x} and \code{y}
+#' where \code{x} is continuous vector and \code{y} are discrete
+#' @param x input (continuous) vector.
+#' @param M input (discrete) matrix. It should have the same number of rows as \code{length(x)}.
+#' @param k number of nearest neighbors.
+#' @param use_cc (logical) if TRUE the algorithm falls into continuous/continuous case
+#' @useDynLib knnmi _mutual_inf_cd_2d
+#'
+#' @return vector of length m, where m is the number of columns in M
+#' vectors \code{x} and \code{y}.
+#' @export
+mutual_inf_cd_2d <- function(x, M, k=3L, use_cc=FALSE){
+
+  stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  res <- .Call('_mutual_inf_cd_2d', x, as.integer(M),
+               as.integer(k), as.logical(use_cc))
+  res
+
+}
+
+
+#'
+#' Mutual information estimation for continuous case of 3 vectors.
+#'
+#' Compute conditional mutual information of \code{x},\code{y} given \code{z}
+#' where \code{x}, \code{y} and \code{z} are all continuous
+#' @param x input vector.
+#' @param y input vector of the same length as x.
+#' @param z
+#' @param k number of nearest neighbors.
+#' @useDynLib knnmi _mutual_inf_ccc_1d
+#'
+#' @return a double-precision value - mutual information estimation for
+#' vectors \code{x} and \code{y}.
+#'
+#' @export
+mutual_inf_ccc_1d <- function(x, y, z, k=3L){
+
+  stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  res <- .Call('_mutual_inf_ccc_1d', x, y, z, as.integer(k))
+  res
+
+}
+
+
+#'
+#' Mutual information estimation for continuous/discrete case of 3 vectors.
+#'
+#' Compute conditional mutual information of \code{x},\code{y} given \code{z}
+#' where \code{x} is continuous, \code{y} and \code{z} are discrete
+#' @param x input vector.
+#' @param y input vector of the same length as x.
+#' @param z
+#' @param k number of nearest neighbors.
+#' @useDynLib knnmi _mutual_inf_cdd_1d
+#'
+#' @return a double-precision value - mutual information estimation for
+#' vectors \code{x} and \code{y}, given \code{z}.
+#'
+#' @export
+mutual_inf_cdd_1d <- function(x, y, z, k=3L){
+
+  stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  res <- .Call('_mutual_inf_cdd_1d', x, y, z, as.integer(k))
+  res
+
+}
+
+
+
+#'
+#' Mutual information estimation for continuous case of a vector and matrix, given matrix.
+#'
+#' Compute conditional mutual information of vector\code{x}, matrix \code{M}
+#' given matrix\code{Z}
+#' where \code{x}, \code{M} and \code{Z} are all continuous
+#' @param x input vector.
+#' @param M
+#' @param Z
+#' @param k number of nearest neighbors.
+#' @useDynLib knnmi _mutual_inf_ccc_2d
+#'
+#' @return a double-precision vector
+#'
+#' @export
+mutual_inf_ccc_2d <- function(x, M, Z, k=3L){
+
+  res <- .Call('_mutual_inf_ccc_2d', x, M, Z, as.integer(k))
+  res
+
+}
+
+
+#'
+#' Mutual information estimation for a continuous vector
+#' and a discrete matrix, given another discrete matrix.
+#'
+#' Compute conditional mutual information of \code{x},\code{M} given \code{Z}
+#' where \code{x} is continuous, \code{M} and \code{Z} are discrete
+#' @param x input vector.
+#' @param M input vector of the same length as x.
+#' @param Z
+#' @param k number of nearest neighbors.
+#' @useDynLib knnmi _mutual_inf_cdd_2d
+#'
+#' @return a double-precision vector - mutual information estimation for
+#' vector \code{x} and matrix \code{M}, given matrix \code{Z}.
+#'
+#' @export
+mutual_inf_cdd_2d <- function(x, M, Z, k=3L){
+
+  stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  res <- .Call('_mutual_inf_cdd_2d', x, as.integer(M), as.integer(Z), as.integer(k))
+  res
+
+}
+
+
