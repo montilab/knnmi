@@ -12,7 +12,7 @@
 
 
 #include <boost/math/special_functions/digamma.hpp>
-#include "nanoflann.hpp"
+#include "nanoflann.h"
 #include <iostream>
 #include <cmath>
 #include <numeric>

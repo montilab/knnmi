@@ -5,7 +5,7 @@
 #ifndef REVEALER_CHEBYSHEVMETRIC_H
 #define REVEALER_CHEBYSHEVMETRIC_H
 
-#include "nanoflann.hpp"
+#include "nanoflann.h"
 
 #include <vector>
 

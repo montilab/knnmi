@@ -5,7 +5,7 @@
 #include "MutualInformation.h"
 #include <cmath>
 #include <array>
-#include "nanoflann.hpp"
+#include "nanoflann.h"
 #include <iostream>
 #include <numeric>
 #include <functional>
