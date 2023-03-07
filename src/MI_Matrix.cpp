@@ -11,7 +11,6 @@
 #include <array>
 
 
-#include <boost/math/special_functions/digamma.hpp>
 #include "nanoflann.h"
 #include <iostream>
 #include <cmath>
