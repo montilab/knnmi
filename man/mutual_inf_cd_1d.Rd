@@ -2,18 +2,18 @@
 % Please edit documentation in R/knnmi.R
 \name{mutual_inf_cd_1d}
 \alias{mutual_inf_cd_1d}
-\title{Mutual information estimation for continuous/descreet case.}
+\title{Mutual information estimation for continuous/discrete case.}
 \usage{
-mutual_inf_cd_1d(x, y, k = 3L, use_cc = TRUE)
+mutual_inf_cd_1d(x, y, k = 3L, use_cc = FALSE)
 }
 \arguments{
-\item{x}{input (continious) vector.}
+\item{x}{input (continuous) vector.}
 
-\item{y}{input (descrete) vector. It should have the same length as x.}
+\item{y}{input (discrete) vector. It should have the same length as x.}
 
 \item{k}{number of nearest neighbors.}
 
-\item{use_cc}{(logical)}
+\item{use_cc}{(logical) if TRUE the algorithm falls into continuous/continuous case}
 }
 \value{
 a double-precision value - mutual information estimation for
@@ -21,5 +21,5 @@ vectors \code{x} and \code{y}.
 }
 \description{
 Compute conditional mutual information of \code{x} and \code{y}
-where \code{x} is continious vector and \code{y} are descrete
+where \code{x} is continuous vector and \code{y} are discrete
 }

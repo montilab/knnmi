@@ -220,7 +220,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     return( mi );
 }
 
-SEXP cond_mutual_inf_ccc_1d_( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
+SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
      *

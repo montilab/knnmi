@@ -61,7 +61,7 @@ namespace CaDrA {
         // KD-Tree for this vector
         nanoflann::KDTreeEigenMatrixAdaptor<MapArrayConst,-1,metric_Chebyshev> vec_tree(1, vec, 10) ;
 
-        std::vector<std::pair<long, double>> ret_matches;
+        std::vector<std::pair<long long, double>> ret_matches;
         for (size_t i = 0 ; i < N ; ++i) {
             double pt = vec(i) ; // avoids type issues with the compiler and the radiusSearch.
             double tmp = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches , nanoflann::SearchParams(10));
@@ -82,7 +82,7 @@ namespace CaDrA {
         tmp_mat.col(1) = vec2 ;
         nanoflann::KDTreeEigenMatrixAdaptor<Array2col ,-1,metric_Chebyshev> vec_tree(2, tmp_mat, 10) ;
 
-        std::vector<std::pair<long, double>> ret_matches;
+        std::vector<std::pair<long long, double>> ret_matches;
         array<double,2> pt ;
         for (size_t i = 0 ; i < N ; ++i) {
             pt[0] = tmp_mat(i,0) ;
@@ -156,7 +156,7 @@ namespace CaDrA {
         array<double,3> query_pt ;
         for (size_t i = 0 ; i < N ; ++i) {
             // store indexes and distances
-            vector<long> ret_indexes(real_k, 0.0);
+            vector<long long> ret_indexes(real_k, 0.0);
             vector<double> out_dists_sqr(real_k,0.0);
 
             for (size_t j = 0 ; j < 3 ; ++j)
@@ -232,9 +232,8 @@ namespace CaDrA {
                 kd_tree_1d label_index_tree(1, masked_x, 10);
                 // Get all of the distances for each point for this label.
                 for (int i = 0; i < count; ++i) {
-                    vector<long> ret_indexes(real_k, 0.0);
+                    vector<long long> ret_indexes(real_k, 0.0);
                     vector<double> out_dists(real_k, 0.0);
-                    int idx = label_indices[i];
                     double query_pt[1] = {masked_x[i]};
                     // out_dists stores the distances for this label. Get the max one.
                     auto neighbors = label_index_tree.index->knnSearch(&query_pt[0], real_k,
@@ -243,7 +242,7 @@ namespace CaDrA {
                     // The last one is out_dists is the furthest distance.
                     auto max_dist = out_dists.back() ;
 
-                    std::vector<std::pair<long, double>> ret_matches;
+                    std::vector<std::pair<long long, double>> ret_matches;
                     m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, max_dist, ret_matches , nanoflann::SearchParams(10))) ;
                 }
             }
@@ -258,14 +257,11 @@ namespace CaDrA {
         double digamma_k = std::accumulate(k_all.begin(),k_all.end(),0.0,
                                            [N_mod](double m, vector<double> &n){ return m +
                                                    MutualInformation::digamma_f(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
-        double sum_m = std::accumulate(m_all.begin(),m_all.end(),0.0) ;
-        double digamma_m = std::accumulate(m_all.begin(),m_all.end(),
-                                                   0.0,  [](double m, double n){ return m +
-                        MutualInformation::digamma_f(n); });
+        double digamma_m = std::accumulate(m_all.begin(),m_all.end(), 0.0, 
+                                           [](double m, double n){ return m + MutualInformation::digamma_f(n); });
         digamma_m = digamma_m / N_mod ;
 
         // mutual info computation
-        // Matlab:   4.602 - 4.3965 + 0.9228 - 1.0961
         double mi = digamma_N - digamma_labels + digamma_k - digamma_m ;
         return mi;
     }
@@ -296,7 +292,7 @@ namespace CaDrA {
         array<double,2> query_pt ;
         for (size_t i = 0 ; i < N ; ++i) {
             // store indexes and distances
-            vector<long> ret_indexes(real_k, 0.0);
+            vector<long long> ret_indexes(real_k, 0.0);
             vector<double> out_dists_sqr(real_k,0.0);
 
             query_pt[0] = tmp_mat(i, 0);
