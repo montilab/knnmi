@@ -3,7 +3,7 @@ Title: k-nearest neighbor mutual information estimator
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given="Brian", family="Gregor", role=c("aut","cre"), 
-             email="bgregor@bu.edu"), 
+             email="bgregor@bu.edu", comment=c(ORCID="0009-0004-9640-0574"))), 
       person(given="Katia", family="Bulekova", role=c("aut"), 
              email="ktrn@bu.edu", comment=c(ORCID="0000-0003-1560-2146")),
       person(given="Reina", family="Chau", role=c("aut"),

@@ -20,6 +20,6 @@ a double-precision value - mutual information estimation for
 vectors \code{x} and \code{y}.
 }
 \description{
-Compute conditional mutual information of \code{x} and \code{y}
+Compute mutual information of \code{x} and \code{y}
 where \code{x} is continuous vector and \code{y} are discrete
 }
