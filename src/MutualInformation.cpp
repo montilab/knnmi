@@ -5,8 +5,7 @@
 #include "MutualInformation.h"
 #include <cmath>
 #include <array>
-#include "nanoflann.h"
-#include <iostream>
+#include "nanoflann.hpp"
 #include <numeric>
 #include <functional>
 #include <list>
@@ -32,14 +31,11 @@ namespace CaDrA {
         Array2col  tmp_mat(N, 2) ;
         tmp_mat.col(0) = scale(x) ;
         tmp_mat.col(1) = scale(y) ;
-        // Pointers to those scaled values so that no extra copies are made.
-        //const double *x_scale =  tmp_mat.col(0).data();
-        //const double *y_scale =  tmp_mat.col(1).data() ;
         // Map the double array pointer to an Eigen vector without a copy.
         MapArrayConst x_scale(tmp_mat.col(0).data(), N) ;
         MapArrayConst y_scale(tmp_mat.col(1).data(), N) ;
 
-        vector<double> dists  = calc_distances(N, tmp_mat).first;
+        vector<double> dists  = calc_distances2d(N, tmp_mat).first;
 
         double x_digamma_sum = sum_digamma_from_neighbors(x_scale, dists) ;
         double y_digamma_sum = sum_digamma_from_neighbors(y_scale, dists) ;
@@ -55,14 +51,14 @@ namespace CaDrA {
     double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) {
         // This one is called from mutual_information_cc and cond_mutual_information for the neighbors
         // for a single vector.
-        size_t N = dists.size() ;
+        long N = dists.size() ;
         double sum = 0.0 ;
 
         // KD-Tree for this vector
         nanoflann::KDTreeEigenMatrixAdaptor<MapArrayConst,-1,metric_Chebyshev> vec_tree(1, vec, 10) ;
 
-        std::vector<std::pair<long long, double>> ret_matches;
-        for (size_t i = 0 ; i < N ; ++i) {
+        std::vector<std::pair<long, double>> ret_matches;
+        for (long i = 0 ; i < N ; ++i) {
             double pt = vec(i) ; // avoids type issues with the compiler and the radiusSearch.
             double tmp = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches , nanoflann::SearchParams(10));
             sum += MutualInformation::digamma_f(tmp) ;
@@ -73,7 +69,7 @@ namespace CaDrA {
 
     double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec1, MapArrayConst &vec2, const vector<double> &dists) {
         // Sum of digamma_f functions over neighbor counts for 2D.
-        size_t N = dists.size() ;
+        long N = dists.size() ;
         double sum = 0.0 ;
 
         // KD-Tree for this vector
@@ -82,9 +78,9 @@ namespace CaDrA {
         tmp_mat.col(1) = vec2 ;
         nanoflann::KDTreeEigenMatrixAdaptor<Array2col ,-1,metric_Chebyshev> vec_tree(2, tmp_mat, 10) ;
 
-        std::vector<std::pair<long long, double>> ret_matches;
+        std::vector<std::pair<long, double>> ret_matches;
         array<double,2> pt ;
-        for (size_t i = 0 ; i < N ; ++i) {
+        for (long i = 0 ; i < N ; ++i) {
             pt[0] = tmp_mat(i,0) ;
             pt[1] = tmp_mat(i,1) ;
             double tmp = vec_tree.index->radiusSearch(pt.data(), dists[i] , ret_matches , nanoflann::SearchParams(10));
@@ -96,12 +92,29 @@ namespace CaDrA {
 
 
 
-    ArrayXd MutualInformation::scale(const ArrayXd &x) const {// Center and scale the x data
+    ArrayXd MutualInformation::scale(const ArrayXd &x, bool add_noise) const {
+        // Scale the vector x by its standard deviation
+
         auto size_v = x.size() ;
         double mean_x = x.mean() ;
-        auto x_p = (x - mean_x) ;
-        double std_dev = std::sqrt((x_p).square().sum()/size_v);
-        ArrayXd x_scale = x_p  / std_dev ;
+        double sum = 0.0 ;
+        for (auto i = 0 ; i < size_v ; i++) {
+            double tmp = x[i] - mean_x ;
+            sum += tmp * tmp ;
+        }
+        double std_dev = std::sqrt(sum / (size_v-1)) ;
+        ArrayXd x_scale = x  / std_dev ;
+
+
+        // add a wee bit of noise as suggested in
+        // Kraskov et. al. 2004.
+        if (add_noise) {
+            double mean_xs = x_scale.mean() ;
+            std::uniform_real_distribution<double> dist(0.0, 1.0);
+            for (auto i = 0 ; i < x_scale.size() ; i++) {
+                x_scale[i] += 1e-10 * mean_xs * dist(*m_rng)  ;
+            }
+        }
         return x_scale;
     }
 
@@ -125,8 +138,8 @@ namespace CaDrA {
         MapArrayConst z_scale(tmp_mat.col(2).data(), N) ;
 
         // Calculating the distances also calculates the number of neighbors, so
-        // calc_distances returns both.
-        vector<double> dists = calc_distances(N, tmp_mat).first ;
+        // calc_distances2 returns both.
+        vector<double> dists = calc_distances3d(N, tmp_mat).first ;
 
         // Get the digamma_f values...
         double xz_digamma_sum = sum_digamma_from_neighbors(x_scale, z_scale, dists) ;
@@ -140,9 +153,9 @@ namespace CaDrA {
         return std::max(0.0,mi) ;
     }
 
-    pair<vector<double>,vector<size_t>>  MutualInformation::calc_distances(const size_t N, const Array<double, -1, 3> &tmp_mat) const {
-        // Calculate the Chebyshev distances and numbers of neighbors for the 2D array tmp_mat.
-        kd_tree_3d mat_index(tmp_mat.cols(),std::cref(tmp_mat),10) ;
+    pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const long N, const Array<double, -1, 3> &tmp_mat) const {
+        // Calculate the Chebyshev distances and numbers of neighbors for the 3D array tmp_mat.
+        kd_tree_3d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
         // We want N neighbors in addition to the point itself so
         // add 1 to the # of neighbors.
         int real_k = m_k + 1  ;
@@ -150,16 +163,16 @@ namespace CaDrA {
         // Chebyshev distance
         vector<double> dists(N) ;
         // Number of neighbors
-        vector<size_t> neighbors(N) ;
+        vector<long> neighbors(N) ;
 
         // a query point.
         array<double,3> query_pt ;
-        for (size_t i = 0 ; i < N ; ++i) {
+        for (long i = 0 ; i < N ; ++i) {
             // store indexes and distances
-            vector<long long> ret_indexes(real_k, 0.0);
+            vector<long> ret_indexes(real_k, 0.0);
             vector<double> out_dists_sqr(real_k,0.0);
 
-            for (size_t j = 0 ; j < 3 ; ++j)
+            for (long j = 0 ; j < 3 ; ++j)
                 query_pt[j] = tmp_mat(i, j);
 
             neighbors[i] = mat_index.index->knnSearch(&query_pt[0], real_k,
@@ -232,8 +245,9 @@ namespace CaDrA {
                 kd_tree_1d label_index_tree(1, masked_x, 10);
                 // Get all of the distances for each point for this label.
                 for (int i = 0; i < count; ++i) {
-                    vector<long long> ret_indexes(real_k, 0.0);
+                    vector<long> ret_indexes(real_k, 0.0);
                     vector<double> out_dists(real_k, 0.0);
+
                     double query_pt[1] = {masked_x[i]};
                     // out_dists stores the distances for this label. Get the max one.
                     auto neighbors = label_index_tree.index->knnSearch(&query_pt[0], real_k,
@@ -242,7 +256,7 @@ namespace CaDrA {
                     // The last one is out_dists is the furthest distance.
                     auto max_dist = out_dists.back() ;
 
-                    std::vector<std::pair<long long, double>> ret_matches;
+                    std::vector<std::pair<long, double>> ret_matches;
                     m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, max_dist, ret_matches , nanoflann::SearchParams(10))) ;
                 }
             }
@@ -257,16 +271,22 @@ namespace CaDrA {
         double digamma_k = std::accumulate(k_all.begin(),k_all.end(),0.0,
                                            [N_mod](double m, vector<double> &n){ return m +
                                                    MutualInformation::digamma_f(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
-        double digamma_m = std::accumulate(m_all.begin(),m_all.end(), 0.0, 
-                                           [](double m, double n){ return m + MutualInformation::digamma_f(n); });
+        double digamma_m = std::accumulate(m_all.begin(),m_all.end(),
+                                           0.0,  [](double m, double n){
+                                                return m + MutualInformation::digamma_f(n); });
         digamma_m = digamma_m / N_mod ;
 
         // mutual info computation
+        // Matlab:   4.602 - 4.3965 + 0.9228 - 1.0961
         double mi = digamma_N - digamma_labels + digamma_k - digamma_m ;
         return mi;
     }
     // Construct this object with the neighborhood size k.
-    MutualInformation::MutualInformation(const int mK) : m_k(mK) {}
+    MutualInformation::MutualInformation(const int mK) : m_k(mK) {
+        // randomly seed our RNG
+        pcg_extras::seed_seq_from<std::random_device> seed_source;
+        m_rng = new pcg64(seed_source);
+    }
 
     int MutualInformation::get_k() const {
         return m_k;
@@ -276,23 +296,23 @@ namespace CaDrA {
         m_k = mK;
     }
 
-    pair<vector<double>,vector<size_t>> MutualInformation::calc_distances(const size_t N, const Array<double, -1, 2> &tmp_mat) const {
+    pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long N, const Array<double, -1, 2> &tmp_mat) const {
         // Calculate the Chebyshev distances and numbers of neighbors for the 2D array tmp_mat.
-        kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),10) ;
+        kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
         // We want N neighbors in addition to the point itself so
         // add 1 to the # of neighbors.
-        int real_k = m_k + 1  ;
+        int real_k = m_k + 1 ;
 
         // Chebyshev distance
         vector<double> dists(N) ;
         // Number of neighbors
-        vector<size_t> neighbors(N) ;
+        vector<long> neighbors(N) ;
 
         // a query point.
         array<double,2> query_pt ;
-        for (size_t i = 0 ; i < N ; ++i) {
+        for (long i = 0 ; i < N ; ++i) {
             // store indexes and distances
-            vector<long long> ret_indexes(real_k, 0.0);
+            vector<long> ret_indexes(real_k, 0.0);
             vector<double> out_dists_sqr(real_k,0.0);
 
             query_pt[0] = tmp_mat(i, 0);
@@ -301,8 +321,8 @@ namespace CaDrA {
             neighbors[i] = mat_index.index->knnSearch(&query_pt[0], real_k,
                                                       &ret_indexes[0], &out_dists_sqr[0]) ;
             out_dists_sqr.resize(neighbors[i]) ;
-            auto max_dist= out_dists_sqr.back() ;//+ std::numeric_limits<double>::epsilon();
-            dists[i] = max_dist ; //abs(x_scale(idx) - x_scale(i));
+            auto max_dist= std::nextafter(*max_element(std::begin(out_dists_sqr), std::end(out_dists_sqr)),0.0)  ; // following sklearn
+            dists[i] = max_dist ;
         }
         return make_pair(dists,neighbors) ;
     }

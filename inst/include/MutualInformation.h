@@ -6,10 +6,11 @@
 #define REVEALER_MUTUALINFORMATION_H
 
 #include <eigen3/Eigen/Core>
-
+#include <random>
 #include <vector>
-#include "nanoflann.h"
+#include "nanoflann.hpp"
 #include "ChebyshevMetric.h"
+#include "pcg_random.hpp"
 
 
 
@@ -54,16 +55,17 @@ namespace CaDrA {
     protected:
         int m_k ;
 
+        pcg64 *m_rng ;
 
-        ArrayXd scale(const ArrayXd &x) const;
+        ArrayXd scale(const ArrayXd &x, bool add_noise=true) const;
 
         // Compute the sum of digamma_f functions as nearest neighbors are calculated.  1D and 2D versions.
         double sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) ;
         double sum_digamma_from_neighbors(MapArrayConst &vec1, MapArrayConst &vec2, const vector<double> &dists) ;
 
         // Calculate distances and nearest neighbors in 2D and 3D.
-        pair<vector<double>,vector<size_t>>  calc_distances(const size_t N, const Array<double, -1, 2> &tmp_mat) const;
-        pair<vector<double>,vector<size_t>>  calc_distances(const size_t N, const Array<double, -1, 3> &tmp_mat) const;
+        pair<vector<double>,vector<long>>  calc_distances2d(const long N, const Array<double, -1, 2> &tmp_mat) const;
+        pair<vector<double>,vector<long>>  calc_distances3d(const long N, const Array<double, -1, 3> &tmp_mat) const;
 
         static double digamma_f(const double x)  ;
     };

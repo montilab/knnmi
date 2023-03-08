@@ -9,10 +9,6 @@
 
 #include <algorithm>
 #include <array>
-
-
-#include "nanoflann.h"
-#include <iostream>
 #include <cmath>
 #include <numeric>
 #include <functional>
