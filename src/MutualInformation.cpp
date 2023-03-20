@@ -20,6 +20,8 @@
 #include <boost/math/special_functions/digamma.hpp>
 #endif
 
+// TODO:  ADd check for mi <0 or > 1.
+//        Add random seed capability for the PCG RNG
 namespace CaDrA {
 
     double MutualInformation::mutual_information_cc(const ArrayXd &x, const ArrayXd& y) {
@@ -45,7 +47,7 @@ namespace CaDrA {
                     + MutualInformation::digamma_f(m_k)
                     - (x_digamma_sum + y_digamma_sum) / N;
 
-        return std::max(0.0,mi) ;
+        return std::max(0.0,std::min(mi,1.0)) ;
     }
 
     double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) {
@@ -150,7 +152,7 @@ namespace CaDrA {
         double mi = MutualInformation::digamma_f(m_k)
                     - (xz_digamma_sum + yz_digamma_sum - z_digamma_sum) / N;
 
-        return std::max(0.0,mi) ;
+        return std::max(0.0,std::min(mi,1.0)) ;
     }
 
     pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const long N, const Array<double, -1, 3> &tmp_mat) const {
@@ -279,8 +281,10 @@ namespace CaDrA {
         // mutual info computation
         // Matlab:   4.602 - 4.3965 + 0.9228 - 1.0961
         double mi = digamma_N - digamma_labels + digamma_k - digamma_m ;
-        return mi;
+        return std::max(0.0,std::min(mi,1.0)) ;
     }
+    
+    
     // Construct this object with the neighborhood size k.
     MutualInformation::MutualInformation(const int mK) : m_k(mK) {
         // randomly seed our RNG
