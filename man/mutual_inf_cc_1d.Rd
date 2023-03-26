@@ -18,7 +18,7 @@ a double-precision value - mutual information estimation for
 vectors \code{x} and \code{y}.
 }
 \description{
-Compute conditional mutual information of \code{x} and \code{y}
+Compute mutual information of \code{x} and \code{y}
 where \code{x} and \code{y} are both continuous
 }
 \examples{
