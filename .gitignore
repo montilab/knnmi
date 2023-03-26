@@ -4,5 +4,5 @@
 .httr-oauth
 .DS_Store
 *.Rproj
-*.o
-*.so
+**.o
+**.so
