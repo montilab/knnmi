@@ -108,7 +108,8 @@ mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=FALSE){
 #' @export
 mutual_inf_cd_2d <- function(x, M, k=3L, use_cc=FALSE){
 
-  stopifnot( "x and M must have the same length"=length(x) == length(M) )
+  stopifnot( "number of rows in matrix M should be equal to length of x"=
+               length(x) == nrow(M) )
   res <- .Call('_mutual_inf_cd_2d', x, as.integer(M),
                as.integer(k), as.logical(use_cc))
   res
@@ -186,7 +187,7 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L){
   res
 
 }
-  
+
 
 #'
 #' Conditional mutual information estimation for a continuous vector
