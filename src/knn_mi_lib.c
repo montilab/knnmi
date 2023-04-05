@@ -186,8 +186,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     /* Get the dimensions of r_input_y */
     y_ncols = Rf_ncols(r_input_y);
     y_nrows = Rf_nrows(r_input_y);
-    printf("NROWS %d\n", y_nrows);
-    
+
     /* R memory allocation */
     mi = PROTECT(allocVector(REALSXP, y_ncols));
     prot_ctr++ ;
