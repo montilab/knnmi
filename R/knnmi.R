@@ -25,7 +25,6 @@
 #'
 #' @export
 mutual_inf_cc_1d <- function(x, y, k=3L){
-
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   res <- .Call('_mutual_inf_cc_1d', x, y, as.integer(k))
   res
@@ -84,12 +83,13 @@ mutual_inf_cc_2d <- function(x, M, k=3L){
 #' vectors \code{x} and \code{y}.
 #' @export
 mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=FALSE){
-
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  if (!is.integer(y)) {
+    y <- as.integer(y)
+  }
   res <- .Call('_mutual_inf_cd_1d', x, as.integer(y),
                as.integer(k), as.logical(use_cc))
   res
-
 }
 
 
@@ -108,12 +108,13 @@ mutual_inf_cd_1d <- function(x, y, k=3L, use_cc=FALSE){
 #' vectors \code{x} and \code{y}.
 #' @export
 mutual_inf_cd_2d <- function(x, M, k=3L, use_cc=FALSE){
-
-  stopifnot( "x and M must have the same length"=length(x) == length(M) )
-  res <- .Call('_mutual_inf_cd_2d', x, as.integer(M),
+  stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
+  if (!is.integer(M)) {
+    M <- matrix(as.integer(M), nrow=nrow(M))
+  }
+  res <- .Call('_mutual_inf_cd_2d', x, M,
                as.integer(k), as.logical(use_cc))
   res
-
 }
 
 
@@ -207,11 +208,15 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L){
 #'
 #' @export
 cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L){
-
   stopifnot( "x and M must have the same length"=length(x) == length(M) )
-  res <- .Call('_cond_mutual_inf_cdd_2d', x, as.integer(M), as.integer(Z), as.integer(k))
+  if (!is.integer(M)) {
+    M <- matrix(as.integer(M), nrow=nrow(M))
+  }
+  if (!is.integer(Z)) {
+    Z <- matrix(as.integer(Z), nrow=nrow(Z))
+  }
+  res <- .Call('_cond_mutual_inf_cdd_2d', x, M, Z, as.integer(k))
   res
-
 }
 
 

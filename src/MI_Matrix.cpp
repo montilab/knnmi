@@ -32,7 +32,9 @@ int mutual_inf_cc_vec(const double *input_x, const double *input_y, const int n_
 
     CaDrA::MutualInformation mut_inf(k) ;
 
-    // Convert to Eigen matrices
+    // Convert to Eigen arrays. This MapArray type uses the 
+    // existing data storage for the Eigen array and does not do
+    // any copies.
     CaDrA::MapArrayConst x_eig(input_x,n_elems) ;
     CaDrA::MapArrayConst y_eig(input_y,n_elems) ;
     *mi = mut_inf.mutual_information_cc(x_eig, y_eig);
@@ -49,7 +51,7 @@ int mutual_inf_cd_vec(const double *input_x, const int *input_y, const int n_ele
     // k - the neighborhood size. 3 is the recommended number.
     CaDrA::MutualInformation mut_inf(k) ;
 
-    // Convert to Eigen matrices
+    // Convert to Eigen arrays
     CaDrA::MapArrayConst x_eig(input_x,n_elems) ;
     CaDrA::MapArrayIConst y_eig(input_y,n_elems) ;
     mi[0] = mut_inf.mutual_information_cd(x_eig, y_eig);
@@ -62,7 +64,7 @@ int cond_mutual_inf_vec(const double *input_x,  const double *input_y, const dou
     // k - number of nearest neighbors
     // mi - return value.
     CaDrA::MutualInformation mut_inf(k) ;
-    // Convert to Eigen matrices
+    // Convert to Eigen arrays
     CaDrA::MapArrayConst x_eig(input_x,n_elems) ;
     CaDrA::MapArrayConst y_eig(input_y,n_elems) ;
     CaDrA::MapArrayConst z_eig(input_z,n_elems) ;
