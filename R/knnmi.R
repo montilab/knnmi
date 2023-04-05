@@ -1,7 +1,7 @@
 #'
 #' Mutual information estimation for continuous case of 2 vectors.
 #'
-#' Compute conditional mutual information of \code{x} and \code{y}
+#' Compute mutual information of \code{x} and \code{y}
 #' where \code{x} and \code{y} are both continuous
 #' @param x input vector.
 #' @param y input vector of the same length as x.
