@@ -125,19 +125,24 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
       kd_tree_1d label_index_tree(1, masked_x, 10);
       // Get all of the distances for each point for this label.
       for (int i = 0; i < count; ++i) {
-        vector<long> ret_indexes(real_k, 0.0);
-        vector<double> out_dists(real_k, 0.0);
+        vector<Eigen::Index> ret_indexes ; //(real_k, 0.0);
+        vector<double> out_dists ; //(real_k, 0.0);
         
         double query_pt[1] = {masked_x[i]};
         // out_dists stores the distances for this label. Get the max one.
-        auto neighbors = label_index_tree.index->knnSearch(&query_pt[0], real_k,
-                                                           &ret_indexes[0], &out_dists[0]);
+        auto neighbors = label_index_tree.index->knnSearch(query_pt, 
+                                                           real_k,
+                                                           ret_indexes.data(), 
+                                                           out_dists.data());
         out_dists.resize(neighbors) ;
         // The last one is out_dists is the furthest distance.
         auto max_dist = out_dists.back() ;
         
-        std::vector<std::pair<long, double>> ret_matches;
-        m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, max_dist, ret_matches , nanoflann::SearchParams(10))) ;
+        std::vector<std::pair<Eigen::Index, double>> ret_matches;
+        m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, 
+                                                              max_dist, 
+                                                              ret_matches , 
+                                                              nanoflann::SearchParams(10))) ;
       }
     }
   }
@@ -221,7 +226,7 @@ double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec, const v
   // KD-Tree for this vector
   nanoflann::KDTreeEigenMatrixAdaptor<MapArrayConst,-1,metric_Chebyshev> vec_tree(1, vec, 10) ;
   
-  std::vector<std::pair<long, double>> ret_matches;
+  std::vector<std::pair<Eigen::Index, double>> ret_matches;
   for (long i = 0 ; i < N ; ++i) {
     double pt = vec(i) ; // avoids type issues with the compiler and the radiusSearch.
     double tmp = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches , nanoflann::SearchParams(10));
@@ -242,7 +247,7 @@ double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec1, MapArr
   tmp_mat.col(1) = vec2 ;
   nanoflann::KDTreeEigenMatrixAdaptor<Array2col ,-1,metric_Chebyshev> vec_tree(2, tmp_mat, 10) ;
   
-  std::vector<std::pair<long, double>> ret_matches;
+  std::vector<std::pair<Eigen::Index, double>> ret_matches;
   array<double,2> pt ;
   for (long i = 0 ; i < N ; ++i) {
     pt[0] = tmp_mat(i,0) ;
@@ -299,7 +304,7 @@ pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const lon
   array<double,3> query_pt ;
   for (long i = 0 ; i < N ; ++i) {
     // store indexes and distances
-    vector<long> ret_indexes(real_k, 0.0);
+    vector<Eigen::Index> ret_indexes(real_k, 0.0);
     vector<double> out_dists_sqr(real_k,0.0);
     
     for (long j = 0 ; j < 3 ; ++j)
@@ -331,7 +336,7 @@ pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long
   array<double,2> query_pt ;
   for (long i = 0 ; i < N ; ++i) {
     // store indexes and distances
-    vector<long> ret_indexes(real_k, 0.0);
+    vector<Eigen::Index> ret_indexes(real_k, 0.0);
     vector<double> out_dists_sqr(real_k,0.0);
     
     query_pt[0] = tmp_mat(i, 0);
