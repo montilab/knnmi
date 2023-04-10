@@ -6,11 +6,17 @@
 #define REVEALER_CHEBYSHEVMETRIC_H
 
 #include "nanoflann.hpp"
+#include <eigen3/Eigen/Core>
 
 #include <vector>
 
 namespace CaDrA {
 /** Chebyshev distance metric
+ *
+ *  Following the example to implement at custom metric from: 
+ *  
+ *  https://github.com/jlblancoc/nanoflann/blob/v1.4.2/examples/pointcloud_custom_metric.cpp
+ *
  *
  *  T Type of the elements (e.g. double, float, uint8_t)
  *  DataSource Source of the data, i.e. where the vectors are stored
@@ -29,16 +35,15 @@ namespace CaDrA {
 
         const DataSource &data_source;
 
-        Chebyshev_Adaptor(const DataSource &_data_source)
-                : data_source(_data_source) {
-        }
+        Chebyshev_Adaptor(const DataSource &_data_source): data_source(_data_source) {}
 
-        inline DistanceType evalMetric(
-                const T *a, const AccessorType b_idx, size_t size) const {
+        // Note the size argument has type Eigen::Index. This avoids template errors between
+        // different compilers and operating systems.
+        inline DistanceType evalMetric(const T *a, const AccessorType b_idx, Eigen::Index size) const {
             // Chebyshev distance: max difference between points in a and b
             DistanceType max_diff = std::numeric_limits<DistanceType>::min();
-            for (size_t i = 0; i < size; ++i) {
-                double diff = std::abs(a[i] - data_source.kdtree_get_pt(b_idx, i));
+            for (auto i = 0; i < size; ++i) {
+                DistanceType diff = std::fabs(a[i] - data_source.kdtree_get_pt(b_idx, i));
                 if (diff > max_diff) {
                     max_diff = diff ;
                 }
@@ -48,7 +53,7 @@ namespace CaDrA {
 
         template<typename U, typename V>
         inline DistanceType accum_dist(const U a, const V b, const size_t) const {
-            return std::abs(a - b);
+            return std::fabs(a - b);
         }
     };
 
@@ -66,3 +71,5 @@ namespace CaDrA {
 }
 
 #endif //REVEALER_CHEBYSHEVMETRIC_H
+
+ 

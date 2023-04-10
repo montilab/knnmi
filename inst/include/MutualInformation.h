@@ -23,6 +23,7 @@ namespace CaDrA {
     // an Eigen ArrayXd.
     typedef Map<const ArrayXd> MapArrayConst;
     typedef Map<const ArrayXi> MapArrayIConst;
+    
     typedef Array<double, Dynamic, 2> Array2col  ;
     typedef Array<double, Dynamic, 3> Array3col  ;
     typedef nanoflann::KDTreeEigenMatrixAdaptor<ArrayXd, -1, metric_Chebyshev> kd_tree_1d ;
