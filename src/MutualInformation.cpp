@@ -17,8 +17,6 @@
 
 #include "nanoflann.hpp"
 
-#include <iostream>
-
 namespace CaDrA {
 
 MutualInformation::MutualInformation(const int mK, const int seed) : m_k(mK), m_seed(seed) {
@@ -111,19 +109,14 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   // Make a kdtree for x_scale, it'll be needed later.
   kd_tree_1d xscale_index_tree(1, x_scale, 10);
   
-  std::cout << "X: " << x.size() << "  y: " << y.size() << std::endl << std::flush ;
-  
   // Chebyshev distance
   ArrayXd dists(N) ;
   // Number of neighbors
   ArrayXd neighbors(N) ;
   
-  std::cout<< "Array setup"<< std::endl << std::flush ;
-  
   // Get the unique labels in y by creating an STL set
   std::set<int> unique_labels{y.data(), y.data() + y.size()};
-  std::cout<< "Unique labels"<< std::endl << std::flush ;
-  
+
   // For each unique label store its count.
   vector<double> label_counts ;
   
@@ -134,9 +127,6 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   vector<double> m_all ;
   // master vector of all indices that are not of unique labels.
   vector<int> all_indices ;
-  
-  std::cout<< "ready to loop over labels "<< unique_labels.size() << std::endl << std::flush ;
-  
   
   for (const auto label : unique_labels) {
     int count = (y == label).count();
@@ -166,15 +156,15 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
       kd_tree_1d label_index_tree(1, masked_x, 10);
       // Get all of the distances for each point for this label.
       for (int i = 0; i < count; ++i) {
-        vector<Eigen::Index> ret_indexes ; //(real_k, 0.0);
-        vector<double> out_dists ; //(real_k, 0.0);
+        vector<Eigen::Index> ret_indexes(real_k, 0.0);
+        vector<double> out_dists(real_k,0.0);
         
         double query_pt[1] = {masked_x[i]};
         // out_dists stores the distances for this label. Get the max one.
         auto neighbors = label_index_tree.index->knnSearch(query_pt, 
                                                            real_k,
-                                                           ret_indexes.data(), 
-                                                           out_dists.data());
+                                                           &ret_indexes[0], 
+                                                           &out_dists[0]);
         out_dists.resize(neighbors) ;
         // The last one is out_dists is the furthest distance.
         auto max_dist = out_dists.back() ;
