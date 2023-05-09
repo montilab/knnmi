@@ -1,6 +1,6 @@
 Package: knnmi
 Title: k-nearest neighbor mutual information estimator
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R: 
     c(person(given="Brian", family="Gregor", role=c("aut","cre"), 
              email="bgregor@bu.edu", comment=c(ORCID="0009-0004-9640-0574")), 

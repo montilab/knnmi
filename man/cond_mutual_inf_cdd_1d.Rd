@@ -4,7 +4,7 @@
 \alias{cond_mutual_inf_cdd_1d}
 \title{Conditional mutual information estimation for continuous/discrete case of 3 vectors.}
 \usage{
-cond_mutual_inf_cdd_1d(x, y, z, k = 3L)
+cond_mutual_inf_cdd_1d(x, y, z, k = 3L, seed = 0L)
 }
 \arguments{
 \item{x}{input vector.}
@@ -14,6 +14,8 @@ cond_mutual_inf_cdd_1d(x, y, z, k = 3L)
 \item{z}{conditional input vector of the same length as x.}
 
 \item{k}{number of nearest neighbors.}
+
+\item{seed}{integer random seed. If seed<=0 a random seed is used.}
 }
 \value{
 a double-precision value - mutual information estimation for

@@ -1,37 +1,68 @@
 //
 // Created by bgregor on 11/1/22.
 //
-
 #include "MutualInformation.h"
+
 #include <cmath>
 #include <array>
-#include "nanoflann.hpp"
 #include <numeric>
 #include <functional>
 #include <list>
 #include <set>
 #include <map>
 
-#ifndef BOOST_DIGAMMA
 #include <Rmath.h>
 #include "R.h"
 #include "Rinternals.h"
-#else
-#include <boost/math/special_functions/digamma.hpp>
-#endif
 
+#include "nanoflann.hpp"
+
+#include <iostream>
 
 namespace CaDrA {
 
-// Construct this object with the neighborhood size k.
-MutualInformation::MutualInformation(const int mK) : m_k(mK) {
-  // randomly seed our RNG
-  pcg_extras::seed_seq_from<std::random_device> seed_source;
-  m_rng = new pcg64(seed_source);
+MutualInformation::MutualInformation(const int mK, const int seed) : m_k(mK), m_seed(seed) {
+  // Construct this object with the neighborhood size k and a 
+  // seed. If the seed is <= 0 then use a random seed.
+  
+  if (seed > 0) {
+    // Reverse the bits in seed.
+    // https://www.geeksforgeeks.org/write-an-efficient-c-program-to-reverse-bits-of-a-number/
+    unsigned int useed = seed ;
+    unsigned int count = sizeof(useed) * 8 - 1;
+    unsigned int reverse_useed = useed;
+    
+    useed >>= 1;
+    while (useed) {
+      reverse_useed <<= 1;
+      reverse_useed |= useed & 1;
+      useed >>= 1;
+      count--;
+    }
+    reverse_useed <<= count;
+    // use seed and its reversed bits representation to help
+    // build a seed sequence.
+    std::seed_seq seq = {seed, ~seed, static_cast<int>(reverse_useed), 
+                         ~static_cast<int>(reverse_useed)};
+    m_rng = new pcg64(seq);
+  } else {
+    pcg_extras::seed_seq_from<std::random_device> ran_seed_source;
+    m_rng = new pcg64(ran_seed_source);
+  }
+}
+
+MutualInformation::~MutualInformation() {
+  if (m_rng != NULL) {
+    delete m_rng ;
+  }
 }
 
 int MutualInformation::get_k() const {
   return m_k;
+}
+
+int MutualInformation::get_seed() const {
+  return m_seed;
 }
 
 void MutualInformation::set_k(int mK) {
@@ -80,13 +111,19 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   // Make a kdtree for x_scale, it'll be needed later.
   kd_tree_1d xscale_index_tree(1, x_scale, 10);
   
+  std::cout << "X: " << x.size() << "  y: " << y.size() << std::endl << std::flush ;
+  
   // Chebyshev distance
   ArrayXd dists(N) ;
   // Number of neighbors
   ArrayXd neighbors(N) ;
   
+  std::cout<< "Array setup"<< std::endl << std::flush ;
+  
   // Get the unique labels in y by creating an STL set
   std::set<int> unique_labels{y.data(), y.data() + y.size()};
+  std::cout<< "Unique labels"<< std::endl << std::flush ;
+  
   // For each unique label store its count.
   vector<double> label_counts ;
   
@@ -97,6 +134,10 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   vector<double> m_all ;
   // master vector of all indices that are not of unique labels.
   vector<int> all_indices ;
+  
+  std::cout<< "ready to loop over labels "<< unique_labels.size() << std::endl << std::flush ;
+  
+  
   for (const auto label : unique_labels) {
     int count = (y == label).count();
     if (count > 0) {
@@ -288,7 +329,8 @@ ArrayXd MutualInformation::scale(const ArrayXd &x, bool add_noise) const {
 }
 
 
-pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const long N, const Array<double, -1, 3> &tmp_mat) const {
+pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const long N, 
+                                                                       const Array3col &tmp_mat) const {
   // Calculate the Chebyshev distances and numbers of neighbors for the 3D array tmp_mat.
   kd_tree_3d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
   // We want N neighbors in addition to the point itself so
@@ -320,7 +362,8 @@ pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const lon
 
 
 
-pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long N, const Array<double, -1, 2> &tmp_mat) const {
+pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long N, 
+                                                                      const Array2col &tmp_mat) const {
   // Calculate the Chebyshev distances and numbers of neighbors for the 2D array tmp_mat.
   kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
   // We want N neighbors in addition to the point itself so

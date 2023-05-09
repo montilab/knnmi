@@ -4,7 +4,7 @@
 \alias{cond_mutual_inf_ccc_2d}
 \title{Conditional mutual information estimation for continuous case of a vector and matrix, given matrix.}
 \usage{
-cond_mutual_inf_ccc_2d(x, M, Z, k = 3L)
+cond_mutual_inf_ccc_2d(x, M, Z, k = 3L, seed = 0L)
 }
 \arguments{
 \item{x}{input vector.}
@@ -14,6 +14,8 @@ cond_mutual_inf_ccc_2d(x, M, Z, k = 3L)
 \item{Z}{conditional input matrix of the same length as x.}
 
 \item{k}{number of nearest neighbors.}
+
+\item{seed}{integer random seed. If seed<=0 a random seed is used.}
 }
 \value{
 a double-precision vector

@@ -13,7 +13,7 @@
 namespace CaDrA {
 /** Chebyshev distance metric
  *
- *  Following the example to implement at custom metric from: 
+ *  Following the example to implement a custom metric for nanoflann from: 
  *  
  *  https://github.com/jlblancoc/nanoflann/blob/v1.4.2/examples/pointcloud_custom_metric.cpp
  *
@@ -28,7 +28,7 @@ namespace CaDrA {
             class T, class DataSource, typename _DistanceType = T,
             typename AccessorType = uint32_t>
     struct Chebyshev_Adaptor {
-        // This gets marked as unused here but it gets used when the
+        // This gets marked as unused here by the IDE but it gets used when the
         // template is instantiated by nanoflann. Don't remove it.
         using ElementType = T;
         using DistanceType = _DistanceType;

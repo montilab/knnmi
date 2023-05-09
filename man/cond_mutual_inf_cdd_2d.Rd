@@ -5,7 +5,7 @@
 \title{Conditional mutual information estimation for a continuous vector
 and a discrete matrix, given another discrete matrix.}
 \usage{
-cond_mutual_inf_cdd_2d(x, M, Z, k = 3L)
+cond_mutual_inf_cdd_2d(x, M, Z, k = 3L, seed = 0L)
 }
 \arguments{
 \item{x}{input vector.}
@@ -15,6 +15,8 @@ cond_mutual_inf_cdd_2d(x, M, Z, k = 3L)
 \item{Z}{conditional input matrix of the same length as x.}
 
 \item{k}{number of nearest neighbors.}
+
+\item{seed}{integer random seed. If seed<=0 a random seed is used.}
 }
 \value{
 a double-precision vector - mutual information estimation for
