@@ -26,3 +26,12 @@ vector \code{x} and matrix \code{M}, given matrix \code{Z}.
 Compute conditional mutual information of \code{x},\code{M} given \code{Z}
 where \code{x} is continuous, \code{M} and \code{Z} are discrete
 }
+\examples{
+data(mutual_info_df)
+
+M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
+ZM <- cbind(mutual_info_df$Xd, mutual_info_df$Zd_XdYc)
+cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XcYc, M, ZM)
+## 0 0
+
+}

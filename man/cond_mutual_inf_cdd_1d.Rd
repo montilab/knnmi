@@ -25,3 +25,12 @@ vectors \code{x} and \code{y}, given \code{z}.
 Compute conditional mutual information of \code{x},\code{y} given \code{z}
 where \code{x} is continuous, \code{y} and \code{z} are discrete
 }
+\examples{
+data(mutual_info_df)
+
+cond_mutual_inf_cdd_1d(mutual_info_df$Xc,
+                  mutual_info_df$Yd,
+                  mutual_info_df$Zd_XdYd, k=3)
+## 0.1754903
+
+}

@@ -25,3 +25,12 @@ vectors \code{x} and \code{y}.
 Compute mutual information of \code{x} and \code{y}
 where \code{x} is continuous vector and \code{y} are discrete
 }
+\examples{
+
+data(mutual_info_df)
+
+M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
+mutual_inf_cd_2d(mutual_info_df$Zc_XcYc, M, k=3)
+## 0 0
+
+}

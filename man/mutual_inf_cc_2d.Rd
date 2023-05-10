@@ -25,13 +25,10 @@ where \code{x} and \code{M} are both continuous
 }
 \examples{
 
-set.seed(21)
-x <- runif(10, min=0, max=1)
+data(mutual_info_df)
 
-M = cbind(x + rnorm(10, 0, 0.1), x + rnorm(10, 0, 0.1),
-                 x + rnorm(10, 0, 0.1))
-
-
-mutual_inf_cc_2d(x, M, k=3)
+M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+mutual_inf_cc_2d(mutual_info_df$Zc_XcYc, M, k=3)
+## 0.0000000 0.2738658
 
 }

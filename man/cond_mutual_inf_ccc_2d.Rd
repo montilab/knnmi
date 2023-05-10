@@ -25,3 +25,13 @@ Compute conditional mutual information of vector\code{x}, matrix \code{M}
 given matrix\code{Z}
 where \code{x}, \code{M} and \code{Z} are all continuous
 }
+\examples{
+data(mutual_info_df)
+
+M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYc,
+                  M,
+                  mutual_info_df$Wc_XdYc, k=3)
+## 0.1498705 0.2738658
+
+}
