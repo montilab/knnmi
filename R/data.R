@@ -30,7 +30,7 @@
 # ## Xd --> Wc <-- Yc
 # ######################################
 # set.seed(456)
-# Xd <- sample(c(0,1),size = N, replace = TRUE)
+# Xd <- sample(c(0L,1L),size = N, replace = TRUE)
 # Wc_XdYc <- rnorm(N, mean = Xd + Yc, sd = SD)
 #
 # ######################################
@@ -42,14 +42,14 @@
 # ##
 # ## generate data
 # set.seed(789)
-# Yd <- sample(c(0,1),size = N, replace = TRUE)
+# Yd <- sample(c(0L,1L),size = N, replace = TRUE)
 # probs <- data.frame(Xd, Yd, XY = sprintf("%d%d", Xd, Yd)) |>
 #   dplyr::mutate(P1 = CPT[XY]) |>
 #   dplyr::mutate(P0 = 1 - P1)
 # head(probs)
 #
 # set.seed(987)
-# Zd_XdYd <- apply(probs |> dplyr::select(P0,P1),1,function(P) sample(c(0,1),size=1,prob=P))
+# Zd_XdYd <- apply(probs |> dplyr::select(P0,P1),1,function(P) sample(c(0L,1L),size=1,prob=P))
 #
 # ######################################
 # ## Create a data frame
