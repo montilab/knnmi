@@ -4,7 +4,7 @@
 \alias{mutual_inf_cc_2d}
 \title{Mutual information estimation for continuous case of an NxM matrix.}
 \usage{
-mutual_inf_cc_2d(x, M, k = 3L)
+mutual_inf_cc_2d(x, M, k = 3L, seed = 0L)
 }
 \arguments{
 \item{x}{input vector.}
@@ -13,6 +13,8 @@ mutual_inf_cc_2d(x, M, k = 3L)
 length of vector x}
 
 \item{k}{number of nearest neighbors.}
+
+\item{seed}{integer random seed. If seed is <=0 a random seed is used.}
 }
 \value{
 a vector of length equal to the number of columns of matrix M.

@@ -8,6 +8,9 @@ test_that("mutual_inf_cd_1d returns expected result", {
 
 
   result <- mutual_inf_cd_1d(x, y, k=3)
+
+
+  result <- mutual_inf_cd_1d(x, y, k=3)
   expect_length(result, 1L)
   expect_type(result, "double")
   expect_equal(round(result,5), 0.36385)

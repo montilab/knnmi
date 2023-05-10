@@ -8,6 +8,7 @@
 #include <eigen3/Eigen/Core>
 #include <random>
 #include <vector>
+
 #include "nanoflann.hpp"
 #include "ChebyshevMetric.h"
 #include "pcg_random.hpp"
@@ -34,9 +35,15 @@ namespace CaDrA {
         // Methods to compute mutual information for
         // continuous and discrete variables.
     public:
-        // Initialize with a neighbor size.
-        MutualInformation(const int k) ;
+        // Constructor
+        // Initialize with a neighbor size and a seed. A seed value
+        // of <= 0 results in a random seed being used.
+        MutualInformation(const int k, const int seed) ;
         MutualInformation() = delete ;
+        
+        // Destructor
+        virtual ~MutualInformation() ;
+        
         // Compute conditional mutual information of 3 continuous variables
         double cond_mutual_information_ccc(const ArrayXd &x, const ArrayXd& y, const ArrayXd& z) ;
 
@@ -52,10 +59,12 @@ namespace CaDrA {
         // getter/setter for m_k.
         int get_k() const;
         void set_k(int mK);
-
+        // getter for the seed value.
+        int get_seed() const ;
     protected:
         int m_k ;
-
+        int m_seed ;
+        // The PCG64 RNG is dynamically allocated.
         pcg64 *m_rng ;
 
         ArrayXd scale(const ArrayXd &x, bool add_noise=true) const;
@@ -65,8 +74,8 @@ namespace CaDrA {
         double sum_digamma_from_neighbors(MapArrayConst &vec1, MapArrayConst &vec2, const vector<double> &dists) ;
 
         // Calculate distances and nearest neighbors in 2D and 3D.
-        pair<vector<double>,vector<long>>  calc_distances2d(const long N, const Array<double, -1, 2> &tmp_mat) const;
-        pair<vector<double>,vector<long>>  calc_distances3d(const long N, const Array<double, -1, 3> &tmp_mat) const;
+        pair<vector<double>,vector<long>>  calc_distances2d(const long N, const Array2col &tmp_mat) const;
+        pair<vector<double>,vector<long>>  calc_distances3d(const long N, const Array3col &tmp_mat) const;
 
         static double digamma_f(const double x)  ;
     };

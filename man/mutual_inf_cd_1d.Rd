@@ -4,7 +4,7 @@
 \alias{mutual_inf_cd_1d}
 \title{Mutual information estimation for continuous/discrete case.}
 \usage{
-mutual_inf_cd_1d(x, y, k = 3L, use_cc = FALSE)
+mutual_inf_cd_1d(x, y, k = 3L, seed = 0L, use_cc = FALSE)
 }
 \arguments{
 \item{x}{input (continuous) vector.}
@@ -12,6 +12,8 @@ mutual_inf_cd_1d(x, y, k = 3L, use_cc = FALSE)
 \item{y}{input (discrete) vector. It should have the same length as x.}
 
 \item{k}{number of nearest neighbors.}
+
+\item{seed}{integer random seed. If seed<=0 a random seed is used.}
 
 \item{use_cc}{(logical) if TRUE the algorithm falls into continuous/continuous case}
 }
