@@ -84,10 +84,7 @@ mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
 #'
 #' data(mutual_info_df)
 #'
-#' mutual_inf_cd_1d(mutual_info_df$Xc, mutual_info_df$Zd_XdYd, k=3)
-#' ## 0
-#'
-#' mutual_inf_cd_1d(mutual_info_df$Yc, mutual_info_df$Zd_XdYd, k=3)
+#' mutual_inf_cd_1d(mutual_info_df$Wc_XdYc, mutual_info_df$Xd, k=3)
 #' ## 0
 #'
 #' @export
@@ -159,10 +156,10 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
 #' @examples
 #' data(mutual_info_df)
 #'
-#' cond_mutual_inf_ccc_1d(mutual_info_df$Xc,
-#'                   mutual_info_df$Yc,
-#'                   mutual_info_df$Zc_XcYc, k=3)
-#' ## 0.1584542
+#' cond_mutual_inf_ccc_1d(mutual_info_df$Zc_XcYc,
+#'                   mutual_info_df$Xc,
+#'                   mutual_info_df$Yc, k=3)
+#' ## 0.2936858
 #'
 #'
 #' @export

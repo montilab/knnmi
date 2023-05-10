@@ -62,7 +62,7 @@
 #
 # ## save toy dataset
 # #saveRDS(mutual_info_df, file = file.path(PATH,"toy_dataset.rds"))
-# #write.csv(toyDF, file = file.path(PATH,"toy_dataset.csv"))
+# #write.csv(mutual_info_df, file = file.path(PATH,"toy_dataset.csv"))
 #
 # ######################################
 # ## Check marginal/partial correlations
