@@ -130,7 +130,7 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   
   for (const auto label : unique_labels) {
     int count = (y == label).count();
-    if (count > 0) {
+    if (count > 1) {
       // Only process the non-unique labels
       label_counts.push_back(count) ;
       // Adjust real_k as necessary.
