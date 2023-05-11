@@ -14,54 +14,25 @@
 #include <Rmath.h>
 #include "R.h"
 #include "Rinternals.h"
+#include <R_ext/Random.h>
 
 #include "nanoflann.hpp"
 
 namespace CaDrA {
 
-MutualInformation::MutualInformation(const int mK, const int seed) : m_k(mK), m_seed(seed) {
-  // Construct this object with the neighborhood size k and a 
-  // seed. If the seed is <= 0 then use a random seed.
-  
-  if (seed > 0) {
-    // Reverse the bits in seed.
-    // https://www.geeksforgeeks.org/write-an-efficient-c-program-to-reverse-bits-of-a-number/
-    unsigned int useed = seed ;
-    unsigned int count = sizeof(useed) * 8 - 1;
-    unsigned int reverse_useed = useed;
-    
-    useed >>= 1;
-    while (useed) {
-      reverse_useed <<= 1;
-      reverse_useed |= useed & 1;
-      useed >>= 1;
-      count--;
-    }
-    reverse_useed <<= count;
-    // use seed and its reversed bits representation to help
-    // build a seed sequence.
-    std::seed_seq seq = {seed, ~seed, static_cast<int>(reverse_useed), 
-                         ~static_cast<int>(reverse_useed)};
-    m_rng = new pcg64(seq);
-  } else {
-    pcg_extras::seed_seq_from<std::random_device> ran_seed_source;
-    m_rng = new pcg64(ran_seed_source);
-  }
+MutualInformation::MutualInformation(const int mK) : m_k(mK) {
+  // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
+  GetRNGstate();
 }
 
 MutualInformation::~MutualInformation() {
-  if (m_rng != NULL) {
-    delete m_rng ;
-  }
+  PutRNGstate();
 }
 
 int MutualInformation::get_k() const {
   return m_k;
 }
 
-int MutualInformation::get_seed() const {
-  return m_seed;
-}
 
 void MutualInformation::set_k(int mK) {
   m_k = mK;
@@ -293,8 +264,8 @@ double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec1, MapArr
 
 
 ArrayXd MutualInformation::scale(const ArrayXd &x, bool add_noise) const {
-  // Scale the vector x by its standard deviation
-  
+  // Scale the vector x by its standard deviation. Add a bit of random 
+  // noise.
   auto size_v = x.size() ;
   double mean_x = x.mean() ;
   double sum = 0.0 ;
@@ -305,14 +276,14 @@ ArrayXd MutualInformation::scale(const ArrayXd &x, bool add_noise) const {
   double std_dev = std::sqrt(sum / (size_v-1)) ;
   ArrayXd x_scale = x  / std_dev ;
   
-  
   // add a wee bit of noise as suggested in
   // Kraskov et. al. 2004.
   if (add_noise) {
     double mean_xs = x_scale.mean() ;
-    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    // Get a uniform value from the R RNG
+    // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
     for (auto i = 0 ; i < x_scale.size() ; i++) {
-      x_scale[i] += 1e-10 * mean_xs * dist(*m_rng)  ;
+      x_scale[i] += 1e-10 * mean_xs * unif_rand();
     }
   }
   return x_scale;

@@ -4,9 +4,9 @@
 #include <Rinternals.h>
 #include <Rmath.h>
 
-extern int mutual_inf_cc_vec( double *input_x,  double *input_y,  int n_elems, int k, int seed, double *mi) ;
-extern int mutual_inf_cd_vec( double *input_x,  int *input_y,  int n_elems,  int k, int seed, double *mi ) ;
-extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, int seed, double *mi) ;
+extern int mutual_inf_cc_vec( double *input_x,  double *input_y,  int n_elems, int k, double *mi) ;
+extern int mutual_inf_cd_vec( double *input_x,  int *input_y,  int n_elems,  int k, double *mi ) ;
+extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
 
 /* Functions defined here:
  *  _mutual_inf_cc_1d - mutual information MI(x;y) continuous-continuous case. x and y are vectors of length N.
@@ -34,7 +34,7 @@ extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *inp
 
 
 
-SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
+SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec( double *input_x,  double *input_y,  int n_elems, int k, int seed, double *mi)
      *
@@ -46,18 +46,18 @@ SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int n_elems, k_value, seed_value ;
+    int n_elems, k_value ;
 
     n_elems = LENGTH(r_input_x);
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(seed)[0] ;
+
     /* R memory allocation */
     mi = PROTECT(allocVector(REALSXP, 1));
 
     p_mi = REAL(mi);
 
-    mutual_inf_cc_vec(REAL(r_input_x), REAL(r_input_y), n_elems,k_value, seed_value, p_mi);
+    mutual_inf_cc_vec(REAL(r_input_x), REAL(r_input_y), n_elems,k_value, p_mi);
 
     /* Lift R garbage protection */
     UNPROTECT(1);
@@ -65,7 +65,7 @@ SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
     return( mi );
 }
 
-SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
+SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec(double *input_x, double *input_y, int n_elems, double *mi,  int k)
      *  r_input_x - the vector of continuous data. size N.
@@ -78,12 +78,12 @@ SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi, *p_y, *p_x ;
-    int y_nrows, y_ncols, k_value, seed_value ;
+    int y_nrows, y_ncols, k_value ;
     int i ;
 
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(seed)[0] ;
+
     /* Get the dimensions of r_input_y */
     y_ncols = Rf_ncols(r_input_y);
     y_nrows = Rf_nrows(r_input_y);
@@ -99,7 +99,7 @@ SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
     p_y = REAL(r_input_y) ;
     p_x = REAL(r_input_x) ;
     for (i = 0 ; i < y_ncols ; i++) {
-        mutual_inf_cc_vec(p_x, &p_y[y_nrows * i], y_nrows, k_value, seed_value, &p_mi[i]);
+        mutual_inf_cc_vec(p_x, &p_y[y_nrows * i], y_nrows, k_value, &p_mi[i]);
     }
     /* Lift R garbage protection */
     UNPROTECT(1);
@@ -107,7 +107,7 @@ SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed) {
     return( mi );
 }
 
-SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP use_cc) {
+SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec( double *input_x,  int *input_y,  int n_elems,  int k, double *mi ) ;
      *
@@ -120,7 +120,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int n_elems, k_value, seed_value ;
+    int n_elems, k_value ;
     int prot_ctr = 0 ;
     int i ;
     int *p_y ;
@@ -131,7 +131,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     n_elems = LENGTH(r_input_x);
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(seed)[0] ;
+ 
     /* R memory allocation */
     mi = PROTECT(allocVector(REALSXP, 1));
     prot_ctr++ ;
@@ -147,7 +147,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     * be set up to use the c-c calculation by default but the flag can be used
     * to switch it to the c-d algorithm if desired. */
     if (!use_cc_val) {
-        mutual_inf_cd_vec(p_x, p_y, n_elems, k_value, seed_value, p_mi);
+        mutual_inf_cd_vec(p_x, p_y, n_elems, k_value, p_mi);
     } else {
         dbl_y = PROTECT(allocVector(REALSXP, n_elems));
         prot_ctr++ ;
@@ -155,7 +155,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
         for (i = 0 ; i < n_elems ; i++) {
             p_dbl_y[i] = (double) p_y[i] ;
         }
-        mutual_inf_cc_vec(p_x, p_dbl_y, n_elems,k_value, seed_value, p_mi);
+        mutual_inf_cc_vec(p_x, p_dbl_y, n_elems,k_value, p_mi);
     }
 
     /* Lift R garbage protection */
@@ -164,7 +164,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     return( mi );
 }
 
-SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP use_cc) {
+SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     /* R C wrapper for:
      * int mutual_inf_cd(double *input_x, int x_elems, int *input_y, int y_nrows, int y_ncols, int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
@@ -177,7 +177,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int y_nrows, y_ncols, k_value, seed_value ;
+    int y_nrows, y_ncols, k_value ;
     int *p_y ;
     SEXP dbl_y ;
     double *p_dbl_y, *p_x ;
@@ -187,7 +187,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
 
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(seed)[0];
+
     /* Get the dimensions of r_input_y */
     y_ncols = Rf_ncols(r_input_y);
     y_nrows = Rf_nrows(r_input_y);
@@ -205,7 +205,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
      * of the integer columns as we go. */
     if (!use_cc_val) {
         for (j = 0 ; j < y_ncols ; j++) {
-            mutual_inf_cd_vec(p_x, &p_y[j * y_nrows], y_nrows, k_value, seed_value, &p_mi[j]);
+            mutual_inf_cd_vec(p_x, &p_y[j * y_nrows], y_nrows, k_value, &p_mi[j]);
         }
     } else {
         dbl_y = PROTECT(allocVector(REALSXP, y_nrows));
@@ -215,7 +215,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
             for (i = 0 ; i < y_nrows ; i++) {
                 p_dbl_y[i] = (double) p_y[j * y_nrows + i] ;
             }
-            mutual_inf_cc_vec(p_x, p_dbl_y, y_nrows, k_value, seed_value, &p_mi[j]);
+            mutual_inf_cc_vec(p_x, p_dbl_y, y_nrows, k_value, &p_mi[j]);
         }
     }
 
@@ -225,7 +225,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP seed, SEXP 
     return( mi );
 }
 
-SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP seed) {
+SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
      *
@@ -236,18 +236,18 @@ SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int n_elems, k_value, seed_value ;
+    int n_elems, k_value ;
 
     n_elems = LENGTH(r_input_x) ;
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(k)[0] ;
+ 
     /* R memory allocation */
     mi = PROTECT(allocVector(REALSXP, 1)) ;
 
     p_mi = REAL(mi) ;
 
-    cond_mutual_inf_vec(REAL(r_input_x), REAL(r_input_y), REAL(r_input_z), n_elems, k_value, seed_value, p_mi) ;
+    cond_mutual_inf_vec(REAL(r_input_x), REAL(r_input_y), REAL(r_input_z), n_elems, k_value, p_mi) ;
 
     /* Lift R garbage protection */
     UNPROTECT(1) ;
@@ -255,7 +255,7 @@ SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     return( mi ) ;
 }
 
-SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP seed) {
+SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k ) {
     /* R C wrapper for:
      * int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
      *
@@ -269,7 +269,7 @@ SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int n_elems, k_value, seed_value ;
+    int n_elems, k_value  ;
     int i ;
     int *p_y, *p_z ;
     SEXP dbl_y, dbl_z ;
@@ -278,7 +278,7 @@ SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     n_elems = LENGTH(r_input_x);
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(k)[0] ;
+ 
     /* R memory allocation */
     mi = PROTECT(allocVector(REALSXP, 1));
 
@@ -299,7 +299,7 @@ SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
         p_dbl_z[i] = (double) p_z[i] ;
     }
 
-    cond_mutual_inf_vec(REAL(r_input_x), p_dbl_y, p_dbl_z, n_elems, k_value, seed_value, p_mi);
+    cond_mutual_inf_vec(REAL(r_input_x), p_dbl_y, p_dbl_z, n_elems, k_value, p_mi);
 
     /* Lift R garbage protection */
     UNPROTECT(3);
@@ -308,7 +308,7 @@ SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
 }
 
 
-SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP seed) {
+SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
@@ -324,13 +324,13 @@ SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int  yz_nrows, yz_ncols, k_value, seed_value ;
+    int  yz_nrows, yz_ncols, k_value ;
     int j ;
     double *p_x, *p_y, *p_z ;
 
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(k)[0] ;
+
     /* Get the dimensions of r_input_y */
     /* r_input_z must have the same dimensions, that should all be checked
      * on the R side. */
@@ -345,7 +345,7 @@ SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     p_y = REAL(r_input_y) ;
     p_z = REAL(r_input_z) ;
     for (j = 0 ; j < yz_ncols ; j++) {
-        cond_mutual_inf_vec(p_x, &p_y[j * yz_nrows], &p_z[j * yz_nrows], yz_nrows, k_value, seed_value, &p_mi[j]);
+        cond_mutual_inf_vec(p_x, &p_y[j * yz_nrows], &p_z[j * yz_nrows], yz_nrows, k_value, &p_mi[j]);
     }
 
     /* Lift R garbage protection */
@@ -355,7 +355,7 @@ SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
 }
 
 
-SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP seed) {
+SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
@@ -371,7 +371,7 @@ SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     /* declare the output mutual information */
     SEXP mi;
     double *p_mi;
-    int yz_nrows, yz_ncols, k_value, seed_value ;
+    int yz_nrows, yz_ncols, k_value ;
     double *p_dbl_y, *p_dbl_z ;
     SEXP dbl_y, dbl_z ;
     int i, j ;
@@ -380,7 +380,7 @@ SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
 
     /* In the R wrapper make sure this is passed as an integer. */
     k_value = INTEGER(k)[0] ;
-    seed_value = INTEGER(seed)[0] ;
+
     /* Get the dimensions of r_input_y */
     /* r_input_z must have the same dimensions, that should all be checked
      * on the R side. */
@@ -406,7 +406,7 @@ SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
             p_dbl_y[i] = (double) p_y[i + j * yz_nrows] ;
             p_dbl_z[i] = (double) p_z[i + j * yz_nrows] ;
         }
-        cond_mutual_inf_vec(p_x, p_dbl_y, p_dbl_z, yz_nrows, k_value, seed_value, &p_mi[j]);
+        cond_mutual_inf_vec(p_x, p_dbl_y, p_dbl_z, yz_nrows, k_value, &p_mi[j]);
     }
 
     /* Lift R garbage protection */

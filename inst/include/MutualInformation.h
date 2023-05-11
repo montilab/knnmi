@@ -6,14 +6,10 @@
 #define REVEALER_MUTUALINFORMATION_H
 
 #include <eigen3/Eigen/Core>
-#include <random>
 #include <vector>
 
 #include "nanoflann.hpp"
 #include "ChebyshevMetric.h"
-#include "pcg_random.hpp"
-
-
 
 using namespace Eigen;
 using namespace std ;
@@ -36,9 +32,8 @@ namespace CaDrA {
         // continuous and discrete variables.
     public:
         // Constructor
-        // Initialize with a neighbor size and a seed. A seed value
-        // of <= 0 results in a random seed being used.
-        MutualInformation(const int k, const int seed) ;
+        // Initialize with a neighbor size.
+        MutualInformation(const int k) ;
         MutualInformation() = delete ;
         
         // Destructor
@@ -59,13 +54,9 @@ namespace CaDrA {
         // getter/setter for m_k.
         int get_k() const;
         void set_k(int mK);
-        // getter for the seed value.
-        int get_seed() const ;
+
     protected:
         int m_k ;
-        int m_seed ;
-        // The PCG64 RNG is dynamically allocated.
-        pcg64 *m_rng ;
 
         ArrayXd scale(const ArrayXd &x, bool add_noise=true) const;
 
