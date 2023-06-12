@@ -28,10 +28,9 @@ where \code{x}, \code{y} and \code{z} are all continuous
 \examples{
 data(mutual_info_df)
 
-cond_mutual_inf_ccc_1d(mutual_info_df$Xc,
-                  mutual_info_df$Yc,
-                  mutual_info_df$Zc_XcYc, k=3)
-## 0.1584542
+cond_mutual_inf_ccc_1d(mutual_info_df$Zc_XcYc,
+                       mutual_info_df$Xc, mutual_info_df$Yc)
+## 0.2936858
 
 
 }

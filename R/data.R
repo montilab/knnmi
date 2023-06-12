@@ -4,7 +4,7 @@
 #'
 #' @usage data(mutual_info_df)
 #'
-#' @format A data frame with 100 rows and 7 columns
+#' @format A data frame with 100 rows and 10 columns
 #'
 "mutual_info_df"
 ## Some parameters

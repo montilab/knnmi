@@ -30,7 +30,7 @@ where \code{x} is continuous vector and \code{y} are discrete
 data(mutual_info_df)
 
 M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-mutual_inf_cd_2d(mutual_info_df$Zc_XcYc, M, k=3)
-## 0 0
+mutual_inf_cd_2d(mutual_info_df$Zc_XdYdWd, M)
+## 0.1070804 0.1041177
 
 }

@@ -263,11 +263,6 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd,
-#'                   M,
-#'                   mutual_info_df$Wd)
-
-#' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
 #' ZM <- cbind(mutual_info_df$Yd, mutual_info_df$Wd)
 #' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd, M, ZM)
 #' ## 0.1757598 0.1086227

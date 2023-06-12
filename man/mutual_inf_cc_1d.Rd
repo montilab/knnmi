@@ -26,10 +26,10 @@ where \code{x} and \code{y} are both continuous
 \examples{
 
 data(mutual_info_df)
-mutual_inf_cc_1d(mutual_info_df$Xc, mutual_info_df$Zc_XcYc, k=3)
+mutual_inf_cc_1d(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
 ## 0
 
-mutual_inf_cc_1d(mutual_info_df$Yc, mutual_info_df$Zc_XcYc, k=3)
+mutual_inf_cc_1d(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
 ## 0.2738658
 
 }

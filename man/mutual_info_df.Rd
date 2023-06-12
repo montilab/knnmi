@@ -5,7 +5,7 @@
 \alias{mutual_info_df}
 \title{Toy Dataset for knnmi package}
 \format{
-A data frame with 100 rows and 7 columns
+A data frame with 100 rows and 10 columns
 }
 \usage{
 data(mutual_info_df)

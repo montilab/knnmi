@@ -29,10 +29,7 @@ where \code{x} is continuous vector and \code{y} are discrete
 
 data(mutual_info_df)
 
-mutual_inf_cd_1d(mutual_info_df$Xc, mutual_info_df$Zd_XdYd, k=3)
-## 0
-
-mutual_inf_cd_1d(mutual_info_df$Yc, mutual_info_df$Zd_XdYd, k=3)
-## 0
+mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+## 0.128029
 
 }

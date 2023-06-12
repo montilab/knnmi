@@ -28,7 +28,7 @@ where \code{x} and \code{M} are both continuous
 data(mutual_info_df)
 
 M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-mutual_inf_cc_2d(mutual_info_df$Zc_XcYc, M, k=3)
-## 0.0000000 0.2738658
+mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M)
+## 0.000000 0.199844
 
 }

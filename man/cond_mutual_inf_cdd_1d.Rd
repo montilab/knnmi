@@ -28,9 +28,8 @@ where \code{x} is continuous, \code{y} and \code{z} are discrete
 \examples{
 data(mutual_info_df)
 
-cond_mutual_inf_cdd_1d(mutual_info_df$Xc,
-                  mutual_info_df$Yd,
-                  mutual_info_df$Zd_XdYd, k=3)
-## 0.1754903
+cond_mutual_inf_cdd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd,
+                  mutual_info_df$Yd)
+## 0.1338664
 
 }
