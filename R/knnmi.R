@@ -14,10 +14,10 @@
 #' @examples
 #'
 #' data(mutual_info_df)
-#' mutual_inf_cc_1d(mutual_info_df$Xc, mutual_info_df$Zc_XcYc, k=3)
+#' mutual_inf_cc_1d(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
 #' ## 0
 #'
-#' mutual_inf_cc_1d(mutual_info_df$Yc, mutual_info_df$Zc_XcYc, k=3)
+#' mutual_inf_cc_1d(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
 #' ## 0.2738658
 #'
 #' @export
@@ -49,8 +49,8 @@ mutual_inf_cc_1d <- function(x, y, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-#' mutual_inf_cc_2d(mutual_info_df$Zc_XcYc, M, k=3)
-#' ## 0.0000000 0.2738658
+#' mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M)
+#' ## 0.000000 0.199844
 #'
 #' @export
 mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
@@ -84,8 +84,8 @@ mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
 #'
 #' data(mutual_info_df)
 #'
-#' mutual_inf_cd_1d(mutual_info_df$Wc_XdYc, mutual_info_df$Xd, k=3)
-#' ## 0
+#' mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+#' ## 0.128029
 #'
 #' @export
 mutual_inf_cd_1d <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
@@ -120,8 +120,8 @@ mutual_inf_cd_1d <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' mutual_inf_cd_2d(mutual_info_df$Zc_XcYc, M, k=3)
-#' ## 0 0
+#' mutual_inf_cd_2d(mutual_info_df$Zc_XdYdWd, M)
+#' ## 0.1070804 0.1041177
 #'
 #' @export
 mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
@@ -157,8 +157,7 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
 #' data(mutual_info_df)
 #'
 #' cond_mutual_inf_ccc_1d(mutual_info_df$Zc_XcYc,
-#'                   mutual_info_df$Xc,
-#'                   mutual_info_df$Yc, k=3)
+#'                        mutual_info_df$Xc, mutual_info_df$Yc)
 #' ## 0.2936858
 #'
 #'
@@ -191,17 +190,16 @@ cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
 #' @examples
 #' data(mutual_info_df)
 #'
-#' cond_mutual_inf_cdd_1d(mutual_info_df$Xc,
-#'                   mutual_info_df$Yd,
-#'                   mutual_info_df$Zd_XdYd, k=3)
-#' ## 0.1754903
+#' cond_mutual_inf_cdd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd,
+#'                   mutual_info_df$Yd)
+#' ## 0.1338664
 #'
 #' @export
 cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_cond_mutual_inf_cdd_1d', x, y, z, as.integer(k), as.integer(seed))
+  res <- .Call('_cond_mutual_inf_cdd_1d', x, as.integer(y), as.integer(z), as.integer(k), as.integer(seed))
   res
 
 }
@@ -227,10 +225,10 @@ cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-#' cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYc,
+#' cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYcWc,
 #'                   M,
-#'                   mutual_info_df$Wc_XdYc, k=3)
-#' ## 0.1498705 0.2738658
+#'                   mutual_info_df$Wc)
+#' ## 0.2029773 0.0000000
 #'
 #' @export
 cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
@@ -265,9 +263,14 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' ZM <- cbind(mutual_info_df$Xd, mutual_info_df$Zd_XdYc)
-#' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XcYc, M, ZM)
-#' ## 0 0
+#' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd,
+#'                   M,
+#'                   mutual_info_df$Wd)
+
+#' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
+#' ZM <- cbind(mutual_info_df$Yd, mutual_info_df$Wd)
+#' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd, M, ZM)
+#' ## 0.1757598 0.1086227
 #'
 #' @export
 cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L, seed=0L){
@@ -277,6 +280,10 @@ cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L, seed=0L){
   if (!is.integer(M)) {
     M <- matrix(as.integer(M), nrow=nrow(M))
   }
+  if (!is.integer(ZM)) {
+    ZM <- matrix(as.integer(ZM), nrow=nrow(ZM))
+  }
+
   if (!is.integer(Z)) {
     Z <- matrix(as.integer(Z), nrow=nrow(Z))
   }
