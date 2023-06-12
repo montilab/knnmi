@@ -1,28 +1,29 @@
 test_that("mutual_inf_cc_2d returns expected result", {
 
-  set.seed(21)
-  x <- runif(10, min=0, max=1)
+  data(mutual_info_df)
+  M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+  result <- mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M)
 
-  M = cbind(x + rnorm(10, 0, 0.1), x + rnorm(10, 0, 0.1),
-                   x + rnorm(10, 0, 0.1))
-
-
-  result <- mutual_inf_cc_2d(x, M, k=3)
-
-  expect_length(result, 3L)
+  expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(round(result,5), c(0.73397, 0.72397, 0.79563))
+  expect_equal(result, c(0.000000, 0.199844), tolerance = 0.000001)
 
 })
 
-test_that("mutual_inf_cc_2d issues error messages when needed", {
+test_that("mutual_inf_cc_2d issues error messages when vector and matrix have different sizes", {
 
-  set.seed(21)
-  x <- runif(10, min=0, max=1)
+  data(mutual_info_df)
+  M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
 
-  M = cbind(rnorm(9, 0, 1), rnorm(9, 0, 1),
-            rnorm(9, 0, 1))
-
-
-  expect_error(  mutual_inf_cc_2d(x, M, k=3) )
+  expect_error( mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc[-1], M))
 })
+
+
+test_that("mutual_inf_cc_2d issues error messages when the value of k is too large", {
+
+  data(mutual_info_df)
+  M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+
+  expect_error(  mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M, k=150) )
+})
+
