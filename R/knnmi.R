@@ -7,25 +7,25 @@
 #' @param y input vector of the same length as x.
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed is <=0 a random seed is used.
-#' @useDynLib knnmi _mutual_inf_cc_1d
+#' @useDynLib knnmi _mutual_inf_cc_vec
 #'
 #' @return a double-precision value - mutual information estimation for
 #' vectors \code{x} and \code{y}.
 #' @examples
 #'
 #' data(mutual_info_df)
-#' mutual_inf_cc_1d(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
+#' mutual_inf_cc_vec(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
 #' ## 0
 #'
-#' mutual_inf_cc_1d(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
+#' mutual_inf_cc_vec(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
 #' ## 0.2738658
 #'
 #' @export
-mutual_inf_cc_1d <- function(x, y, k=3L, seed=0L){
+mutual_inf_cc_vec <- function(x, y, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_mutual_inf_cc_1d', x, y, as.integer(k), as.integer(seed))
+  res <- .Call('_mutual_inf_cc_vec', x, y, as.integer(k), as.integer(seed))
   res
 }
 
@@ -41,7 +41,7 @@ mutual_inf_cc_1d <- function(x, y, k=3L, seed=0L){
 #' length of vector x
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed is <=0 a random seed is used.
-#' @useDynLib knnmi _mutual_inf_cc_2d
+#' @useDynLib knnmi _mutual_inf_cc_mat
 #'
 #' @return a vector of length equal to the number of columns of matrix M.
 #' @examples
@@ -49,17 +49,17 @@ mutual_inf_cc_1d <- function(x, y, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-#' mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M)
+#' mutual_inf_cc_mat(mutual_info_df$Zc_XcYcWc, M)
 #' ## 0.000000 0.199844
 #'
 #' @export
-mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
+mutual_inf_cc_mat <- function(x, M, k=3L, seed=0L){
 
   stopifnot( "number of rows in matrix M should be equal to length of x"=
                length(x) == nrow(M) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_mutual_inf_cc_2d', x, M, as.integer(k), as.integer(seed))
+  res <- .Call('_mutual_inf_cc_mat', x, M, as.integer(k), as.integer(seed))
   res
 
 }
@@ -76,7 +76,7 @@ mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
 #' @param use_cc (logical) if TRUE the algorithm falls into continuous/continuous case
-#' @useDynLib knnmi _mutual_inf_cd_1d
+#' @useDynLib knnmi _mutual_inf_cd_vec
 #'
 #' @return a double-precision value - mutual information estimation for
 #' vectors \code{x} and \code{y}.
@@ -84,18 +84,18 @@ mutual_inf_cc_2d <- function(x, M, k=3L, seed=0L){
 #'
 #' data(mutual_info_df)
 #'
-#' mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+#' mutual_inf_cd_vec(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
 #' ## 0.128029
 #'
 #' @export
-mutual_inf_cd_1d <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
+mutual_inf_cd_vec <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
   if (!is.integer(y)) {
     y <- as.integer(y)
   }
-  res <- .Call('_mutual_inf_cd_1d', x, y,
+  res <- .Call('_mutual_inf_cd_vec', x, y,
                as.integer(k), as.integer(seed), as.logical(use_cc))
   res
 }
@@ -111,7 +111,7 @@ mutual_inf_cd_1d <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
 #' @param use_cc (logical) if TRUE the algorithm falls into continuous/continuous case
-#' @useDynLib knnmi _mutual_inf_cd_2d
+#' @useDynLib knnmi _mutual_inf_cd_mat
 #'
 #' @return vector of length m, where m is the number of columns in M
 #' vectors \code{x} and \code{y}.
@@ -120,11 +120,11 @@ mutual_inf_cd_1d <- function(x, y, k=3L, seed=0L, use_cc=FALSE){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' mutual_inf_cd_2d(mutual_info_df$Zc_XdYdWd, M)
+#' mutual_inf_cd_mat(mutual_info_df$Zc_XdYdWd, M)
 #' ## 0.1070804 0.1041177
 #'
 #' @export
-mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
+mutual_inf_cd_mat <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
   stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
@@ -132,7 +132,7 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
     M <- matrix(as.integer(M), nrow=nrow(M))
   }
 
-  res <- .Call('_mutual_inf_cd_2d', x, M,
+  res <- .Call('_mutual_inf_cd_mat', x, M,
                as.integer(k), as.integer(seed), as.logical(use_cc))
   res
 }
@@ -148,7 +148,7 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
 #' @param z conditional input vector of the same length as x.
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
-#' @useDynLib knnmi _cond_mutual_inf_ccc_1d
+#' @useDynLib knnmi _cond_mutual_inf_ccc_vec
 #'
 #' @return a double-precision value - mutual information estimation for
 #' vectors \code{x} and \code{y}.
@@ -156,18 +156,18 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
 #' @examples
 #' data(mutual_info_df)
 #'
-#' cond_mutual_inf_ccc_1d(mutual_info_df$Zc_XcYc,
+#' cond_mutual_inf_ccc_vec(mutual_info_df$Zc_XcYc,
 #'                        mutual_info_df$Xc, mutual_info_df$Yc)
 #' ## 0.2936858
 #'
 #'
 #' @export
-cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
+cond_mutual_inf_ccc_vec <- function(x, y, z, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   stopifnot( "x and y must have the same length"=length(x) == length(z) )
   stopifnot("k must be less than the length of input vectors"=k < length(x))
 
-  res <- .Call('_cond_mutual_inf_ccc_1d', x, y, z, as.integer(k), as.integer(seed))
+  res <- .Call('_cond_mutual_inf_ccc_vec', x, y, z, as.integer(k), as.integer(seed))
   res
 
 }
@@ -183,7 +183,7 @@ cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
 #' @param z conditional input vector of the same length as x.
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
-#' @useDynLib knnmi _cond_mutual_inf_cdd_1d
+#' @useDynLib knnmi _cond_mutual_inf_cdd_vec
 #'
 #' @return a double-precision value - mutual information estimation for
 #' vectors \code{x} and \code{y}, given \code{z}.
@@ -191,17 +191,17 @@ cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
 #' @examples
 #' data(mutual_info_df)
 #'
-#' cond_mutual_inf_cdd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd,
+#' cond_mutual_inf_cdd_vec(mutual_info_df$Zc_XdYd, mutual_info_df$Xd,
 #'                   mutual_info_df$Yd)
 #' ## 0.1338664
 #'
 #' @export
-cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
+cond_mutual_inf_cdd_vec <- function(x, y, z, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
   stopifnot( "x and y must have the same length"=length(x) == length(z) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_cond_mutual_inf_cdd_1d', x, as.integer(y),
+  res <- .Call('_cond_mutual_inf_cdd_vec', x, as.integer(y),
                as.integer(z), as.integer(k), as.integer(seed))
   res
 
@@ -220,7 +220,7 @@ cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
 #' @param Z conditional input matrix of the same length as x.
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
-#' @useDynLib knnmi _cond_mutual_inf_ccc_2d
+#' @useDynLib knnmi _cond_mutual_inf_ccc_mat
 #'
 #' @return a double-precision vector
 #'
@@ -229,13 +229,13 @@ cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
 #'
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
 #' ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
-#' cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYcWc,
+#' cond_mutual_inf_ccc_mat(mutual_info_df$Zc_XcYcWc,
 #'                   M,
 #'                   ZM)
 #' ## 0.1171533 0.2192397
 #'
 #' @export
-cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
+cond_mutual_inf_ccc_mat <- function(x, M, Z, k=3L, seed=0L){
   stopifnot( "M must be a matrix"= (class(M)[1]=="matrix"))
   stopifnot( "Z must be a matrix"= (class(Z)[1]=="matrix"))
   stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
@@ -243,7 +243,7 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
   stopifnot( "M and Z must be the same size"=dim(M) == dim(Z) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_cond_mutual_inf_ccc_2d', x, M, Z, as.integer(k), as.integer(seed))
+  res <- .Call('_cond_mutual_inf_ccc_mat', x, M, Z, as.integer(k), as.integer(seed))
   res
 
 }
@@ -260,7 +260,7 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
 #' @param Z conditional input matrix of the same length as x.
 #' @param k number of nearest neighbors.
 #' @param seed integer random seed. If seed<=0 a random seed is used.
-#' @useDynLib knnmi _cond_mutual_inf_cdd_2d
+#' @useDynLib knnmi _cond_mutual_inf_cdd_mat
 #'
 #'
 #' @return a double-precision vector - mutual information estimation for
@@ -271,11 +271,11 @@ cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
 #' ZM <- cbind(mutual_info_df$Yd, mutual_info_df$Wd)
-#' cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd, M, ZM)
+#' cond_mutual_inf_cdd_mat(mutual_info_df$Zc_XdYdWd, M, ZM)
 #' ## 0.1757598 0.1086227
 #'
 #' @export
-cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L, seed=0L){
+cond_mutual_inf_cdd_mat <- function(x, M, Z, k=3L, seed=0L){
 
   stopifnot( "M must be a matrix"= (class(M)[1]=="matrix"))
   stopifnot( "Z must be a matrix"= (class(Z)[1]=="matrix"))
@@ -293,7 +293,7 @@ cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L, seed=0L){
   if (!is.integer(Z)) {
     Z <- matrix(as.integer(Z), nrow=nrow(Z))
   }
-  res <- .Call('_cond_mutual_inf_cdd_2d', x, M, Z, as.integer(k), as.integer(seed))
+  res <- .Call('_cond_mutual_inf_cdd_mat', x, M, Z, as.integer(k), as.integer(seed))
   res
 }
 

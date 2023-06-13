@@ -9,19 +9,19 @@ extern int mutual_inf_cd_vec( double *input_x,  int *input_y,  int n_elems,  int
 extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
 
 /* Functions defined here:
- *  _mutual_inf_cc_1d - mutual information MI(x;y) continuous-continuous case. x and y are vectors of length N.
- *  _mutual_inf_cc_2d - MI(x;y) c-c case where y is an NxM matrix. Returns an MI vector of length M.
- *  _mutual_inf_cd_1d - MI(x;y) continuous-discrete case. x and y are vectors of length N. y is an integer vector of
+ *  _mutual_inf_cc_vec - mutual information MI(x;y) continuous-continuous case. x and y are vectors of length N.
+ *  _mutual_inf_cc_mat - MI(x;y) c-c case where y is an NxM matrix. Returns an MI vector of length M.
+ *  _mutual_inf_cd_vec - MI(x;y) continuous-discrete case. x and y are vectors of length N. y is an integer vector of
  *      discrete values. Accepts a flag to internally use the continuous-continuous algorithm instead of a faster c-d algorithm.
- *  _mutual_inf_cd_2d - mutual information MI(x;y) c-d case where y is an NxM matrix.
+ *  _mutual_inf_cd_mat - mutual information MI(x;y) c-d case where y is an NxM matrix.
  *      Also accepts the flag to switch the algorithm.
- *  _cond_mutual_inf_ccc_1d - conditional mutual information CMI(x;y|z), where x,y,z are continuous values and are
+ *  _cond_mutual_inf_ccc_vec - conditional mutual information CMI(x;y|z), where x,y,z are continuous values and are
  *      vectors of length N.
- *  _cond_mutual_inf_ccc_2d - CMI(x;y|z), where x,y,z are continuous values. x is of length N, y and z are matrices of
+ *  _cond_mutual_inf_ccc_mat - CMI(x;y|z), where x,y,z are continuous values. x is of length N, y and z are matrices of
  *      size NxM.
- *  _cond_mutual_inf_cdd_1d - conditional mutual information CMI(x;y|z), where x is continuous. y and z are
+ *  _cond_mutual_inf_cdd_vec - conditional mutual information CMI(x;y|z), where x is continuous. y and z are
  *      integer vectors of discrete values. All are vectors of length N.
- *  _cond_mutual_inf_ccc_2d - CMI(x;y|z), where x is continuous and both y and z are discrete. x is of length N,
+ *  _cond_mutual_inf_ccc_mat - CMI(x;y|z), where x is continuous and both y and z are discrete. x is of length N,
  *      y and z are integer matrices of size NxM.
  *
  *  The 1d functions all return a single numeric value. The 2d functions return a numeric vector of length M.
@@ -34,7 +34,7 @@ extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *inp
 
 
 
-SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
+SEXP _mutual_inf_cc_vec( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec( double *input_x,  double *input_y,  int n_elems, int k, int seed, double *mi)
      *
@@ -65,7 +65,7 @@ SEXP _mutual_inf_cc_1d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     return( mi );
 }
 
-SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
+SEXP _mutual_inf_cc_mat( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec(double *input_x, double *input_y, int n_elems, double *mi,  int k)
      *  r_input_x - the vector of continuous data. size N.
@@ -107,7 +107,7 @@ SEXP _mutual_inf_cc_2d( SEXP r_input_x, SEXP r_input_y, SEXP k) {
     return( mi );
 }
 
-SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
+SEXP _mutual_inf_cd_vec( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     /* R C wrapper for:
      * int mutual_inf_cc_vec( double *input_x,  int *input_y,  int n_elems,  int k, double *mi ) ;
      *
@@ -164,7 +164,7 @@ SEXP _mutual_inf_cd_1d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     return( mi );
 }
 
-SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
+SEXP _mutual_inf_cd_mat( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     /* R C wrapper for:
      * int mutual_inf_cd(double *input_x, int x_elems, int *input_y, int y_nrows, int y_ncols, int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
@@ -225,7 +225,7 @@ SEXP _mutual_inf_cd_2d( SEXP r_input_x, SEXP r_input_y, SEXP k, SEXP use_cc) {
     return( mi );
 }
 
-SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
+SEXP _cond_mutual_inf_ccc_vec( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
      *
@@ -255,7 +255,7 @@ SEXP _cond_mutual_inf_ccc_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
     return( mi ) ;
 }
 
-SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k ) {
+SEXP _cond_mutual_inf_cdd_vec( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k ) {
     /* R C wrapper for:
      * int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *input_z,  int n_elems,  int k, double *mi) ;
      *
@@ -308,7 +308,7 @@ SEXP _cond_mutual_inf_cdd_1d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
 }
 
 
-SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
+SEXP _cond_mutual_inf_ccc_mat( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
@@ -355,7 +355,7 @@ SEXP _cond_mutual_inf_ccc_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SE
 }
 
 
-SEXP _cond_mutual_inf_cdd_2d( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
+SEXP _cond_mutual_inf_cdd_mat( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
     /* R C wrapper for:
      * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
      *  r_input_x - the vector of continuous data. size N.
