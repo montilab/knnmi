@@ -198,9 +198,11 @@ cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
 #' @export
 cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
+  stopifnot( "x and y must have the same length"=length(x) == length(z) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
-  res <- .Call('_cond_mutual_inf_cdd_1d', x, as.integer(y), as.integer(z), as.integer(k), as.integer(seed))
+  res <- .Call('_cond_mutual_inf_cdd_1d', x, as.integer(y),
+               as.integer(z), as.integer(k), as.integer(seed))
   res
 
 }
