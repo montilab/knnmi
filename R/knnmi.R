@@ -228,15 +228,17 @@ cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
 #' data(mutual_info_df)
 #'
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+#' ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
 #' cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYcWc,
 #'                   M,
-#'                   mutual_info_df$Wc)
-#' ## 0.2029773 0.0000000
+#'                   ZM)
+#' ## 0.1171533 0.2192397
 #'
 #' @export
 cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
   stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
   stopifnot( "x and Z must have the same length"=length(x) == nrow(Z) )
+  stopifnot( "M and Z must be the same size"=dim(M) == dim(Z) )
   stopifnot("k must be less than the length of x"=k < length(x))
 
   res <- .Call('_cond_mutual_inf_ccc_2d', x, M, Z, as.integer(k), as.integer(seed))

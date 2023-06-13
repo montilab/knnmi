@@ -29,9 +29,10 @@ where \code{x}, \code{M} and \code{Z} are all continuous
 data(mutual_info_df)
 
 M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
+ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
 cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYcWc,
                   M,
-                  mutual_info_df$Wc)
-## 0.2029773 0.0000000
+                  ZM)
+## 0.1171533 0.2192397
 
 }
