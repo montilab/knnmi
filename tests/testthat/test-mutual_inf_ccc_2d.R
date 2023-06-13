@@ -31,11 +31,13 @@ test_that("mutual_inf_ccc_2d issues error messages when vector and matrix have d
 })
 
 
-test_that("mutual_inf_cc_2d issues error messages when the value of k is too large", {
+test_that("mutual_inf_ccc_2d issues error messages when the value of k is too large", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-
-  expect_error(  mutual_inf_cc_2d(mutual_info_df$Zc_XcYcWc, M, k=150) )
+  ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
+  expect_error( cond_mutual_inf_ccc_2d(mutual_info_df$Zc_XcYcWc,
+                                       M,
+                                       ZM, k=101))
 })
 
