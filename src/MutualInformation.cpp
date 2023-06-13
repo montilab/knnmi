@@ -20,25 +20,13 @@
 
 namespace CaDrA {
 
-MutualInformation::MutualInformation(const int mK) : m_k(mK) {
-  // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
-  GetRNGstate();
-}
+MutualInformation::MutualInformation(const int mK) : MutualInformationBase(mK) {}
 
-MutualInformation::~MutualInformation() {
-  PutRNGstate();
-}
+MutualInformation::~MutualInformation() {}
 
-int MutualInformation::get_k() const {
-  return m_k;
-}
+ 
 
-
-void MutualInformation::set_k(int mK) {
-  m_k = mK;
-}
-
-double MutualInformation::mutual_information_cc(const ArrayXd &x, const ArrayXd& y) {
+double MutualInformation::compute_c(const ArrayXd &x, const ArrayXd& y) {
   // compute mutual information based on k-nearest neighbors
   // This implements the algorithm described in: https://doi.org/10.1103/PhysRevE.69.066138
   // Alexander Kraskov, Harald Stogbauer, and Peter Grassberger
@@ -62,14 +50,12 @@ double MutualInformation::mutual_information_cc(const ArrayXd &x, const ArrayXd&
   double y_digamma_sum = sum_digamma_from_neighbors(y_scale, dists) ;
   
   // mutual info computation
-  double mi = MutualInformation::digamma_f(N)
-    + MutualInformation::digamma_f(m_k)
-    - (x_digamma_sum + y_digamma_sum) / N;
+  double mi = digamma_f(N) + digamma_f(m_k) - (x_digamma_sum + y_digamma_sum) / N;
     
-    return std::max(0.0,std::min(mi,1.0)) ;
+  return std::max(0.0,std::min(mi,1.0)) ;
 }
 
-double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi &y) {
+double MutualInformation::compute_d(const ArrayXd &x, const ArrayXi &y) {
   // Compute the mutual information for a continuous vector x and a
   // discrete vector y.
   // This implements the algorithm described in: https://doi.org/10.1371/journal.pone.0087357
@@ -152,15 +138,14 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   double digamma_N = digamma_f(N) ;
   // Calculate the mean of digammas over the count of samples for each label.
   double digamma_labels = std::accumulate(label_counts.begin(),label_counts.end(),0.0,
-                                          [N_mod](double m, double n){ return m +
-                                            MutualInformation::digamma_f(n) * n / N_mod ; } ) ;
+                                          [&](double m, double n){ return m + 
+                                            digamma_f(n) * n / N_mod ; } ) ;
   // Get the same for the k's used at each label.
   double digamma_k = std::accumulate(k_all.begin(),k_all.end(),0.0,
-                                     [N_mod](double m, vector<double> &n){ return m +
-                                       MutualInformation::digamma_f(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
-  double digamma_m = std::accumulate(m_all.begin(),m_all.end(),
-                                     0.0,  [](double m, double n){
-                                       return m + MutualInformation::digamma_f(n); });
+                                     [&](double m, vector<double> &n){ return m +
+                                       digamma_f(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
+  double digamma_m = std::accumulate(m_all.begin(),m_all.end(), 0.0,  
+                                     [&](double m, double n){return m + digamma_f(n); });
   digamma_m = digamma_m / N_mod ;
   
   // mutual info computation
@@ -168,159 +153,6 @@ double MutualInformation::mutual_information_cd(const ArrayXd &x, const ArrayXi 
   double mi = digamma_N - digamma_labels + digamma_k - digamma_m ;
   return std::max(0.0,std::min(mi,1.0)) ;
 }
-
-double MutualInformation::cond_mutual_information_ccc(const ArrayXd &x, const ArrayXd& y, const ArrayXd& z) {
-  // This implements the CMI algorithm described in: https://doi.org/10.1016/j.eswa.2012.05.014
-  // 
-  // Alkiviadis Tsimpiris, Ioannis Vlachos, Dimitris Kugiumtzis,
-  // Nearest neighbor estimate of conditional mutual information in feature selection,
-  // Expert Systems with Applications,
-  // Volume 39, Issue 16, 2012, Pages 12697-12708
-  //
-  // Compute the conditional mutual information.
-  // CMI = psi(m_k) - mean( psi(n_xz[i] + psy(n_yz[i])-psi(n_z[i]) ) for all elements i
-  auto N = x.size() ;
-  
-  // Get the 3-dimensional distance, and then re-use that for the xz, yz, and calculations, so it
-  // proceeds pretty much exactly as before.
-  
-  Array3col tmp_mat(N, 3) ;
-  
-  tmp_mat.col(0) = scale(x) ;
-  tmp_mat.col(1) = scale(y) ;
-  tmp_mat.col(2) = scale(z) ;
-  
-  // Map the double array pointer to an Eigen vector without a copy.
-  MapArrayConst x_scale(tmp_mat.col(0).data(), N) ;
-  MapArrayConst y_scale(tmp_mat.col(1).data(), N) ;
-  MapArrayConst z_scale(tmp_mat.col(2).data(), N) ;
-  
-  // Calculating the distances also calculates the number of neighbors, so
-  // calc_distances2 returns both.
-  vector<double> dists = calc_distances3d(N, tmp_mat).first ;
-  
-  // Get the digamma_f values...
-  double xz_digamma_sum = sum_digamma_from_neighbors(x_scale, z_scale, dists) ;
-  double yz_digamma_sum = sum_digamma_from_neighbors(y_scale, z_scale, dists) ;
-  double z_digamma_sum = sum_digamma_from_neighbors(z_scale, dists) ;
-  
-  // mutual info computation
-  double mi = MutualInformation::digamma_f(m_k)
-    - (xz_digamma_sum + yz_digamma_sum - z_digamma_sum) / N;
-  
-  return std::max(0.0,std::min(mi,1.0)) ;
-}
-
-double MutualInformation::cond_mutual_information_cdd(const ArrayXd &x, const ArrayXi& y, const ArrayXi& z) {
-  // Implement conditional mutual information between continuous x and discrete y & z.
-  // Convert the y & z arrays over to double precision, call the
-  // cond_mutual_information_ccc function.
-  
-  return cond_mutual_information_ccc(x, y.cast<double>(), z.cast<double>()) ;
-}
-
-double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) {
-  // This one is called from mutual_information_cc and cond_mutual_information for the neighbors
-  // for a single vector.
-  long N = dists.size() ;
-  double sum = 0.0 ;
-  
-  // KD-Tree for this vector
-  nanoflann::KDTreeEigenMatrixAdaptor<MapArrayConst,-1,metric_Chebyshev> vec_tree(1, vec, 10) ;
-  
-  std::vector<std::pair<Eigen::Index, double>> ret_matches;
-  for (long i = 0 ; i < N ; ++i) {
-    double pt = vec(i) ; // avoids type issues with the compiler and the radiusSearch.
-    double tmp = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches , nanoflann::SearchParams(10));
-    sum += MutualInformation::digamma_f(tmp) ;
-    ret_matches.clear() ;
-  }
-  return sum ;
-}
-
-double MutualInformation::sum_digamma_from_neighbors(MapArrayConst &vec1, MapArrayConst &vec2, const vector<double> &dists) {
-  // Sum of digamma_f functions over neighbor counts for 2D.
-  long N = dists.size() ;
-  double sum = 0.0 ;
-  
-  // KD-Tree for this vector
-  Array2col tmp_mat(N, 2) ;
-  tmp_mat.col(0) = vec1 ;
-  tmp_mat.col(1) = vec2 ;
-  nanoflann::KDTreeEigenMatrixAdaptor<Array2col ,-1,metric_Chebyshev> vec_tree(2, tmp_mat, 10) ;
-  
-  std::vector<std::pair<Eigen::Index, double>> ret_matches;
-  array<double,2> pt ;
-  for (long i = 0 ; i < N ; ++i) {
-    pt[0] = tmp_mat(i,0) ;
-    pt[1] = tmp_mat(i,1) ;
-    double tmp = vec_tree.index->radiusSearch(pt.data(), dists[i] , ret_matches , nanoflann::SearchParams(10));
-    sum += MutualInformation::digamma_f(tmp) ;
-    ret_matches.clear() ;
-  }
-  return sum ;
-}
-
-
-
-ArrayXd MutualInformation::scale(const ArrayXd &x, bool add_noise) const {
-  // Scale the vector x by its standard deviation. Add a bit of random 
-  // noise.
-  auto size_v = x.size() ;
-  double mean_x = x.mean() ;
-  double sum = 0.0 ;
-  for (auto i = 0 ; i < size_v ; i++) {
-    double tmp = x[i] - mean_x ;
-    sum += tmp * tmp ;
-  }
-  double std_dev = std::sqrt(sum / (size_v-1)) ;
-  ArrayXd x_scale = x  / std_dev ;
-  
-  // add a wee bit of noise as suggested in
-  // Kraskov et. al. 2004.
-  if (add_noise) {
-    double mean_xs = x_scale.mean() ;
-    // Get a uniform value from the R RNG
-    // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
-    for (auto i = 0 ; i < x_scale.size() ; i++) {
-      x_scale[i] += 1e-10 * mean_xs * unif_rand();
-    }
-  }
-  return x_scale;
-}
-
-
-pair<vector<double>,vector<long>>  MutualInformation::calc_distances3d(const long N, 
-                                                                       const Array3col &tmp_mat) const {
-  // Calculate the Chebyshev distances and numbers of neighbors for the 3D array tmp_mat.
-  kd_tree_3d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
-  // We want N neighbors in addition to the point itself so
-  // add 1 to the # of neighbors.
-  int real_k = m_k + 1  ;
-  
-  // Chebyshev distance
-  vector<double> dists(N) ;
-  // Number of neighbors
-  vector<long> neighbors(N) ;
-  
-  // a query point.
-  array<double,3> query_pt ;
-  for (long i = 0 ; i < N ; ++i) {
-    // store indexes and distances
-    vector<Eigen::Index> ret_indexes(real_k, 0.0);
-    vector<double> out_dists_sqr(real_k,0.0);
-    
-    for (long j = 0 ; j < 3 ; ++j)
-      query_pt[j] = tmp_mat(i, j);
-    
-    neighbors[i] = mat_index.index->knnSearch(&query_pt[0], real_k,
-                                              &ret_indexes[0], &out_dists_sqr[0]) ;
-    out_dists_sqr.resize(neighbors[i]) ;
-    dists[i] = out_dists_sqr.back() ;
-  }
-  return make_pair(dists,neighbors) ;
-}
-
 
 
 pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long N, 
@@ -355,15 +187,5 @@ pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long
   return make_pair(dists,neighbors) ;
 }
 
-// For development outside of R use the Boost library's digamma_f funtion. 
-// For R integration this can is switched to call the digamma_f
-// function that comes with R.
-inline double MutualInformation::digamma_f(const double x) {
-#ifndef BOOST_DIGAMMA
-  return digamma(x) ;
-#else
-  return boost::math::digamma(x) ;
-#endif
-}
 
 } // CaDrA
