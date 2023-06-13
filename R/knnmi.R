@@ -164,7 +164,8 @@ mutual_inf_cd_2d <- function(x, M, k=3L, seed=0L, use_cc=FALSE){
 #' @export
 cond_mutual_inf_ccc_1d <- function(x, y, z, k=3L, seed=0L){
   stopifnot( "x and y must have the same length"=length(x) == length(y) )
-  stopifnot("k must be less than the length of x"=k < length(x))
+  stopifnot( "x and y must have the same length"=length(x) == length(z) )
+  stopifnot("k must be less than the length of input vectors"=k < length(x))
 
   res <- .Call('_cond_mutual_inf_ccc_1d', x, y, z, as.integer(k), as.integer(seed))
   res
