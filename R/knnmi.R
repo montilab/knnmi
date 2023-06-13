@@ -286,8 +286,8 @@ cond_mutual_inf_cdd_2d <- function(x, M, Z, k=3L, seed=0L){
   if (!is.integer(M)) {
     M <- matrix(as.integer(M), nrow=nrow(M))
   }
-  if (!is.integer(ZM)) {
-    ZM <- matrix(as.integer(ZM), nrow=nrow(ZM))
+  if (!is.integer(Z)) {
+    Z <- matrix(as.integer(Z), nrow=nrow(Z))
   }
 
   if (!is.integer(Z)) {
