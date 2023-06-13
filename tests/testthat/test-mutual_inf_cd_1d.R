@@ -1,28 +1,29 @@
 test_that("mutual_inf_cd_1d returns expected result", {
 
+  data(mutual_info_df)
 
-  x <- c(0.91 , 0.08, 0.13, 0.01, 0.08,
-         0.25, 0.86, 0.13 , 0.26, 0.7)
+  result <- mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
 
-  y <- c(1, 0, 0, 0, 0, 1, 0, 0, 0, 1)
-
-
-  result <- mutual_inf_cd_1d(x, y, k=3)
-
-
-  result <- mutual_inf_cd_1d(x, y, k=3)
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(round(result,5), 0.36385)
+  expect_equal(result, 0.128029, tolerance = 0.00001)
 })
 
 
-test_that("mutual_inf_cd_1d issues error messages when needed", {
+test_that("mutual_inf_cc_1d issues error messages when vector sizes are different", {
 
-  x <- c(0.91 , 0.08, 0.13, 0.01, 0.08,
-         0.25, 0.86, 0.13 , 0.26, 0.7)
+  data(mutual_info_df)
 
-  y <- c(1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 2)
+  expect_error(  mutual_inf_cd_1d(mutual_info_df$Zc_XdYd[-1],
+                                  mutual_info_df$Xd) )
+})
 
-  expect_error(  mutual_inf_cd_1d(x, y, k=3) )
+
+test_that("mutual_inf_cc_1d issues error messages when the value of k is too large", {
+
+  data(mutual_info_df)
+
+  result <- mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+  expect_error(  mutual_inf_cd_1d(mutual_info_df$Zc_XdYd,
+                                  mutual_info_df$Xd, k=101) )
 })
