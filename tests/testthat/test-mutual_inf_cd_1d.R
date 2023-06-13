@@ -23,7 +23,7 @@ test_that("mutual_inf_cc_1d issues error messages when the value of k is too lar
 
   data(mutual_info_df)
 
-  result <- mutual_inf_cd_1d(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+
   expect_error(  mutual_inf_cd_1d(mutual_info_df$Zc_XdYd,
                                   mutual_info_df$Xd, k=101) )
 })
