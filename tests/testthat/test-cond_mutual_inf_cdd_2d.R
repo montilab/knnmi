@@ -1,10 +1,9 @@
-test_that("mutual_inf_cdd_2d returns expected result", {
+test_that("cond_mutual_inf_cdd_2d returns expected result", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
   ZM <- cbind(mutual_info_df$Yd, mutual_info_df$Wd)
-  result <- cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd,
-                                   M, ZM)
+  result <- cond_mutual_inf_cdd_2d(mutual_info_df$Zc_XdYdWd, M=M, Z=ZM)
 
   expect_length(result, 2L)
   expect_type(result, "double")
@@ -12,7 +11,7 @@ test_that("mutual_inf_cdd_2d returns expected result", {
 
 })
 
-test_that("mutual_inf_cdd_2d issues error messages when vector and matrix have different sizes", {
+test_that("cond_mutual_inf_cdd_2d issues error messages when vector and matrix have different sizes", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
@@ -31,7 +30,7 @@ test_that("mutual_inf_cdd_2d issues error messages when vector and matrix have d
 })
 
 
-test_that("mutual_inf_cdd_2d issues error messages when the value of k is too large", {
+test_that("cond_mutual_inf_cdd_2d issues error messages when the value of k is too large", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)

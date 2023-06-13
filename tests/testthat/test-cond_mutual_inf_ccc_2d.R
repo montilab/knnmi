@@ -1,4 +1,4 @@
-test_that("mutual_inf_ccc_2d returns expected result", {
+test_that("cond_mutual_inf_ccc_2d returns expected result", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
@@ -12,7 +12,7 @@ test_that("mutual_inf_ccc_2d returns expected result", {
 
 })
 
-test_that("mutual_inf_ccc_2d issues error messages when vector and matrix have different sizes", {
+test_that("cond_mutual_inf_ccc_2d issues error messages when vector and matrix have different sizes", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
@@ -31,7 +31,7 @@ test_that("mutual_inf_ccc_2d issues error messages when vector and matrix have d
 })
 
 
-test_that("mutual_inf_ccc_2d issues error messages when the value of k is too large", {
+test_that("cond_mutual_inf_ccc_2d issues error messages when the value of k is too large", {
 
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)

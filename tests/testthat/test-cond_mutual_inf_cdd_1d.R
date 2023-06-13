@@ -1,4 +1,4 @@
-test_that("mutual_inf_cdd_1d returns expected result", {
+test_that("cond_mutual_inf_cdd_1d returns expected result", {
 
   data(mutual_info_df)
 
@@ -11,7 +11,7 @@ test_that("mutual_inf_cdd_1d returns expected result", {
 })
 
 
-test_that("mutual_inf_cdd_1d issues error messages when vector sizes are different", {
+test_that("cond_mutual_inf_cdd_1d issues error messages when vector sizes are different", {
 
   data(mutual_info_df)
 
@@ -27,7 +27,7 @@ test_that("mutual_inf_cdd_1d issues error messages when vector sizes are differe
 })
 
 
-test_that("mutual_inf_cdd_1d issues error messages when the value of k is too large", {
+test_that("cond_mutual_inf_cdd_1d issues error messages when the value of k is too large", {
 
   data(mutual_info_df)
 
