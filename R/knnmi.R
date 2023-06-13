@@ -236,6 +236,8 @@ cond_mutual_inf_cdd_1d <- function(x, y, z, k=3L, seed=0L){
 #'
 #' @export
 cond_mutual_inf_ccc_2d <- function(x, M, Z, k=3L, seed=0L){
+  stopifnot( "M must be a matrix"= (class(M)[1]=="matrix"))
+  stopifnot( "Z must be a matrix"= (class(Z)[1]=="matrix"))
   stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
   stopifnot( "x and Z must have the same length"=length(x) == nrow(Z) )
   stopifnot( "M and Z must be the same size"=dim(M) == dim(Z) )
