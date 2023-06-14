@@ -62,8 +62,10 @@ double CondMutualInformation::compute_c(const ArrayXd &x, const ArrayXd& y, cons
   // mutual info computation
   double mi = digamma_f(m_k)- (xz_digamma_sum + yz_digamma_sum - z_digamma_sum) / N;
   
-  return std::max(0.0,std::min(mi,1.0)) ;
+  // Can't return less than 0.
+  return std::max(0.0,mi) ;
 }
+
 
 double CondMutualInformation::compute_d(const ArrayXd &x, const ArrayXi& y, const ArrayXi& z) {
   // Implement conditional mutual information between continuous x and discrete y & z.

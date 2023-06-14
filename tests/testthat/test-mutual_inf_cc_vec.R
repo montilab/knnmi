@@ -7,6 +7,10 @@ test_that("mutual_inf_cc_vec returns expected result", {
   expect_type(result, "double")
   expect_equal(result, 0.0, tolerance = 0.00001)
 
+  result <- mutual_inf_cc_vec(mutual_info_df$Xc, mutual_info_df$Zc_XcYc,k=5)
+  expect_length(result, 1L)
+  expect_type(result, "double")
+  expect_equal(result, 0.010756, tolerance = 0.00001)
 
   result <- mutual_inf_cc_vec(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
   expect_length(result, 1L)

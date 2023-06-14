@@ -7,6 +7,11 @@ test_that("mutual_inf_cc_mat returns expected result", {
   expect_length(result, 2L)
   expect_type(result, "double")
   expect_equal(result, c(0.000000, 0.199844), tolerance = 0.000001)
+  
+  result <- mutual_inf_cc_mat(mutual_info_df$Zc_XcYcWc, M, k=4)
+  expect_length(result, 2L)
+  expect_type(result, "double")
+  expect_equal(result, c(0.01247941, 0.14108933), tolerance = 0.000001)  
 
 })
 

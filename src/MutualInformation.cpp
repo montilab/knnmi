@@ -51,8 +51,9 @@ double MutualInformation::compute_c(const ArrayXd &x, const ArrayXd& y) {
   
   // mutual info computation
   double mi = digamma_f(N) + digamma_f(m_k) - (x_digamma_sum + y_digamma_sum) / N;
-    
-  return std::max(0.0,std::min(mi,1.0)) ;
+  
+  // Can't return less than 0.
+  return std::max(0.0,mi) ;
 }
 
 double MutualInformation::compute_d(const ArrayXd &x, const ArrayXi &y) {
@@ -149,9 +150,9 @@ double MutualInformation::compute_d(const ArrayXd &x, const ArrayXi &y) {
   digamma_m = digamma_m / N_mod ;
   
   // mutual info computation
-  // Matlab:   4.602 - 4.3965 + 0.9228 - 1.0961
   double mi = digamma_N - digamma_labels + digamma_k - digamma_m ;
-  return std::max(0.0,std::min(mi,1.0)) ;
+  // Can't return less than 0.
+  return std::max(0.0,mi) ;
 }
 
 
