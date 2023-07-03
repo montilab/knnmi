@@ -26,9 +26,10 @@ extern int cond_mutual_inf_vec( double *input_x,   double *input_y,  double *inp
 
 SEXP _mutual_inf_cc( SEXP r_input_x, SEXP r_input_y, SEXP k) {
   /* R C wrapper for:
-   * int mutual_inf_cc_vec( double *input_x,  double *input_y,  int n_elems, int k, double *mi)
-   * r_input_x is the target vector. It can be an R vector of length N, or matrix of size Nx1.
-   * r_input_y is the features matrix. It can be an R vector or length N or matrix of size NxM.
+   * int mutual_inf_cc_vec(const double *input_x, const double *input_y, const int n_elems,  
+   *                       const int k, double *mi)
+   * r_input_x is the target vector. It is an R vector of length N.
+   * r_input_y is the features matrix. It can be an R vector or length N or matrix of size MxN.
    * Assume that the size double-checking happened in R.
    * k is the number of nearest neighbors.
    * The mutual information is returned as a numeric vector of length 1.
@@ -36,36 +37,53 @@ SEXP _mutual_inf_cc( SEXP r_input_x, SEXP r_input_y, SEXP k) {
   
   /* declare the output mutual information */
   SEXP mi;
-  double *p_mi, *p_y, *p_x ;
-  int n_rows, n_cols,   k_value, i  ;
+  double *p_mi, *p_y, *p_x, *p_buf_y ;
+  int n_rows, n_cols,   k_value, i, j  ;
   
-  if (!isMatrix(r_input_x)) {
-    /* Assume it's a vector */
-    n_rows = LENGTH(r_input_x);
-  } else {
-    /* It's a matrix, get the number of rows */
-    n_rows = Rf_nrows(r_input_x);
-  }
+  /* Assume x is a vector - this is checked on the R side.*/
+  n_cols = LENGTH(r_input_x) ;
+
   /* In the R wrapper make sure this is passed as an integer. */
   k_value = INTEGER(k)[0] ;
   
   /* Check if r_input_y is a vector or a matrix. */
-  n_cols = 1 ;
+  n_rows = 1 ;
   if (isMatrix(r_input_y)) {
     /* It's a matrix, get the number of columns */
-    n_cols = Rf_ncols(r_input_y);
+    n_rows = Rf_nrows(r_input_y);
   } 
 
   /* R memory allocation */
-  mi = PROTECT(allocVector(REALSXP, n_cols));
+  mi = PROTECT(allocVector(REALSXP, n_rows));
   
-  /* get pointers */
+  /* get pointers to the inputs and outputs */
   p_mi = REAL(mi);
   p_y = REAL(r_input_y) ;
   p_x = REAL(r_input_x) ;
-  for (i = 0 ; i < n_cols ; i++) {
-   mutual_inf_cc_vec(p_x, &p_y[n_rows * i], n_rows, k_value, &p_mi[i]);
+  
+  /* If y is a matrix, allocate a buffer */
+  if (n_rows > 1) {
+    p_buf_y = (double *) malloc(n_cols * sizeof(double)) ;
+  } else {
+    /* Point the buffer to the y vector */
+    p_buf_y = p_y ;
   }
+  
+  for (i = 0 ; i < n_rows ; i++) {
+    /* Copy the buffer if there are more than 1 row */
+    if (n_rows > 1) {
+      for (j = 0 ; j < n_cols ; j++) {
+        p_buf_y[j] = p_y[j * n_rows + i] ;
+      }
+    }
+    mutual_inf_cc_vec(p_x, p_buf_y, n_cols, k_value, &p_mi[i]);
+  }
+  
+  /* free the buffer if needed */
+  if (n_rows > 1) {
+    free(p_buf_y);  
+  } 
+  
   /* Lift R garbage protection */
   UNPROTECT(1);  
   /* Return the mi vector */
@@ -74,7 +92,8 @@ SEXP _mutual_inf_cc( SEXP r_input_x, SEXP r_input_y, SEXP k) {
 
 SEXP _mutual_inf_cd( SEXP r_input_x, SEXP r_input_y, SEXP k) {
   /* R C wrapper for:
-   * int mutual_inf_cd(double *input_x, int x_elems, int *input_y, int y_nrows, int y_ncols, int k, double *mi) ;
+   * int mutual_inf_cd_vec(const double *input_x, const int *input_y, const int n_elems, 
+   *                       const int k, double *mi )
    *  r_input_x - the vector of continuous data. size N.
    *  r_input_y - input matrix. size NxM
    *  k - number of nearest neighbors.
@@ -85,40 +104,57 @@ SEXP _mutual_inf_cd( SEXP r_input_x, SEXP r_input_y, SEXP k) {
   SEXP mi;
   double *p_mi;
   int n_rows, n_cols, k_value ;
-  int *p_y ;
+  int *p_y, *p_buf_y ;
   double *p_x ;
-  int prot_ctr = 0 ;
-  int i ;
+  int i, j ;
+  
+  /* Assume x is a vector - this is checked on the R side.*/
+  n_cols = LENGTH(r_input_x) ;
   
   /* In the R wrapper make sure this is passed as an integer. */
   k_value = INTEGER(k)[0] ;
   
-  /* Get the dimensions of r_input_y */
-  n_rows = Rf_nrows(r_input_y);
   /* Check if r_input_y is a vector or a matrix. */
-  n_cols = 1 ;
+  n_rows = 1 ;
   if (isMatrix(r_input_y)) {
     /* It's a matrix, get the number of columns */
-    n_cols = Rf_ncols(r_input_y);
-  }
+    n_rows = Rf_nrows(r_input_y);
+  } 
+  
   /* R memory allocation */
-  mi = PROTECT(allocVector(REALSXP, n_cols));
-  prot_ctr++ ;
+  mi = PROTECT(allocVector(REALSXP, n_rows));
   
+  /* get pointers to the inputs and outputs */
   p_mi = REAL(mi);
-  p_x = REAL(r_input_x);
   p_y = INTEGER(r_input_y) ;
+  p_x = REAL(r_input_x) ;
   
-  /* As with the 1D case try using the c-d algorithm unless a negative MI is returned.
-   * If it is...re-do the entire calculation with the c-c algorithm, doing type conversions
-   * of the integer columns as we go. */
-  for (i = 0 ; i < n_cols ; i++) {
-    mutual_inf_cd_vec(p_x, &p_y[n_rows * i], n_rows, k_value, &p_mi[i]);
+  /* If y is a matrix, allocate a buffer */
+  if (n_rows > 1) {
+    p_buf_y = (int *) malloc(n_cols * sizeof(int)) ;
+  } else {
+    /* Point the buffer to the y vector */
+    p_buf_y = p_y ;
   }
+  
+  for (i = 0 ; i < n_rows ; i++) {
+    /* Copy the buffer if there are more than 1 row */
+    if (n_rows > 1) {
+      for (j = 0 ; j < n_cols ; j++) {
+        p_buf_y[j] = p_y[j * n_rows + i] ;
+      }
+    }
+    mutual_inf_cd_vec(p_x, p_buf_y, n_cols, k_value, &p_mi[i]);
+  }
+  
+  /* free the buffer if needed */
+  if (n_rows > 1) {
+    free(p_buf_y);  
+  } 
   
   /* Lift R garbage protection */
-  UNPROTECT(prot_ctr);
-  
+  UNPROTECT(1);  
+  /* Return the mi vector */
   return( mi );
 }
 
@@ -188,7 +224,7 @@ SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, S
       mi = PROTECT(allocVector(REALSXP, num_rows));
       p_mi = REAL(mi);
       /* Get a row buffer */
-      p_buf_z = malloc(len_x * sizeof(double)) ;
+      p_buf_z = (double *) malloc(len_x * sizeof(double)) ;
       /* Loop over each row of Z */
       for (i = 0 ; i < num_rows ; i++) {
         for (j = 0 ; j < len_x ; j++) {
@@ -206,7 +242,7 @@ SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, S
       mi = PROTECT(allocVector(REALSXP, num_rows));
       p_mi = REAL(mi);
       /* Get a row buffer */
-      p_buf_y = malloc(len_x * sizeof(double)) ;
+      p_buf_y = (double *) malloc(len_x * sizeof(double)) ;
       /* Loop over each row of Z */
       for (i = 0 ; i < num_rows ; i++) {
         for (j = 0 ; j < len_x ; j++) {
@@ -225,8 +261,8 @@ SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, S
       mi = PROTECT(allocVector(REALSXP, num_rows));
       p_mi = REAL(mi);
       /* Get row buffers */
-      p_buf_y = malloc(len_x * sizeof(double)) ;
-      p_buf_z = malloc(len_x * sizeof(double)) ;
+      p_buf_y = (double *) malloc(len_x * sizeof(double)) ;
+      p_buf_z = (double *) malloc(len_x * sizeof(double)) ;
       /* Loop over each row of Z */
       for (i = 0 ; i < num_rows ; i++) {
         for (j = 0 ; j < len_x ; j++) {

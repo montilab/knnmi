@@ -3,13 +3,14 @@ test_that("mutual_inf_cc returns expected result", {
   
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
-  result <- mutual_inf_cc(mutual_info_df$Zc_XcYcWc, M)
+  tM <- t(M)
+  result <- mutual_inf_cc(mutual_info_df$Zc_XcYcWc, tM)
   
   expect_length(result, 2L)
   expect_type(result, "double")
   expect_equal(result, c(0.000000, 0.199844), tolerance = 0.000001)
   
-  result <- mutual_inf_cc(mutual_info_df$Zc_XcYcWc, M, k=4)
+  result <- mutual_inf_cc(mutual_info_df$Zc_XcYcWc, t(M), k=4)
   expect_length(result, 2L)
   expect_type(result, "double")
   expect_equal(result, c(0.01247941, 0.14108933), tolerance = 0.000001)  
@@ -21,7 +22,7 @@ test_that("mutual_inf_cc issues error messages when vector and matrix have diffe
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
   
-  expect_error( mutual_inf_cc(mutual_info_df$Zc_XcYcWc[-1], M))
+  expect_error( mutual_inf_cc(mutual_info_df$Zc_XcYcWc[-1], t(M)))
 })
 
 
@@ -30,7 +31,7 @@ test_that("mutual_inf_cc issues error messages when the value of k is too large"
   data(mutual_info_df)
   M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
   
-  expect_error(  mutual_inf_cc(mutual_info_df$Zc_XcYcWc, M, k=150) )
+  expect_error(  mutual_inf_cc(mutual_info_df$Zc_XcYcWc, t(M), k=150) )
 })
 
 test_that("mutual_inf_cc returns expected result", {
@@ -38,17 +39,17 @@ test_that("mutual_inf_cc returns expected result", {
   
   data(mutual_info_df)
   
-  result <- mutual_inf_cc(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
+  result <- mutual_inf_cc(mutual_info_df$Xc, t(mutual_info_df$Zc_XcYc))
   expect_length(result, 1L)
   expect_type(result, "double")
   expect_equal(result, 0.0, tolerance = 0.00001)
   
-  result <- mutual_inf_cc(mutual_info_df$Xc, mutual_info_df$Zc_XcYc,k=5)
+  result <- mutual_inf_cc(mutual_info_df$Xc, t(mutual_info_df$Zc_XcYc),k=5)
   expect_length(result, 1L)
   expect_type(result, "double")
   expect_equal(result, 0.010756, tolerance = 0.00001)
   
-  result <- mutual_inf_cc(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
+  result <- mutual_inf_cc(mutual_info_df$Yc, t(mutual_info_df$Zc_XcYc))
   expect_length(result, 1L)
   expect_type(result, "double")
   expect_equal(result, 0.2738658, tolerance = 0.00001)

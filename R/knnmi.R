@@ -19,10 +19,10 @@
 #'
 #' data(mutual_info_df)
 #' set.seed(654321)
-#' mutual_inf_cc(mutual_info_df$Xc, mutual_info_df$Zc_XcYc)
+#' mutual_inf_cc(mutual_info_df$Xc, t(mutual_info_df$Zc_XcYc))
 #' ## 0
 #'
-#' mutual_inf_cc(mutual_info_df$Yc, mutual_info_df$Zc_XcYc)
+#' mutual_inf_cc(mutual_info_df$Yc, t(mutual_info_df$Zc_XcYc))
 #' ## 0.2738658
 #'
 #' @export
@@ -34,6 +34,14 @@ mutual_inf_cc <- function(target, features, k=3L){
                  length(target) == ncol(features) )
   }
   stopifnot("k must be less than the length of target"=k < length(target))
+  
+  # Make sure the inputs are double precision floats
+  if (!is.double(target)) {
+    storage.mode(target) <- "double"
+  }
+  if (!is.double(features)) {
+    storage.mode(features) <- "double"
+  }
   
   res <- .Call('_mutual_inf_cc', target, features, as.integer(k))
   res
@@ -62,11 +70,11 @@ mutual_inf_cc <- function(target, features, k=3L){
 #'
 #' data(mutual_info_df)
 #' set.seed(654321)
-#' mutual_inf_cd(mutual_info_df$Zc_XdYd, mutual_info_df$Xd)
+#' mutual_inf_cd(mutual_info_df$Zc_XdYd, t(mutual_info_df$Xd))
 #' ## 0.128029
 #'
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' mutual_inf_cd(mutual_info_df$Zc_XdYdWd, M)
+#' mutual_inf_cd(mutual_info_df$Zc_XdYdWd, t(M))
 #' ## 0.1070804 0.1041177
 #' 
 #' @export
@@ -78,6 +86,14 @@ mutual_inf_cd <- function(target, features, k=3L){
                  length(target) == ncol(features) )
   }
   stopifnot("k must be less than the length of target"=k < length(target))
+  
+  # Make sure the target is double precision floats
+  if (!is.double(target)) {
+    storage.mode(target) <- "double"
+  }
+  # Make sure this is an integer array - a numeric array containing
+  # integer values isn't quite sufficient, they need to be actual
+  # integers so the C/C++ code works properly.
   if (!is.integer(features)) {
     storage.mode(features) <- "integer"
   }
@@ -101,7 +117,7 @@ mutual_inf_cd <- function(target, features, k=3L){
 #' Volume 39, Issue 16, 2012, Pages 12697-12708
 #' 
 #' @param x vector of size N.
-#' @param M input vector of length N or a matrix of size NxM.
+#' @param Y input vector of length N or a matrix of size NxM.
 #' @param Z conditional input vector of length N or a matrix of size NxM.
 #' @param k number of nearest neighbors.
 #' @useDynLib knnmi _cond_mutual_inf
@@ -112,12 +128,12 @@ mutual_inf_cd <- function(target, features, k=3L){
 #' data(mutual_info_df)
 #' set.seed(654321)
 #' cond_mutual_inf(mutual_info_df$Zc_XcYc,
-#'                        mutual_info_df$Xc, mutual_info_df$Yc)
+#'                        mutual_info_df$Xc, t(mutual_info_df$Yc))
 #' ## 0.2936858
 #' 
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
 #' ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
-#' cond_mutual_inf(mutual_info_df$Zc_XcYcWc, M, ZM)
+#' cond_mutual_inf(mutual_info_df$Zc_XcYcWc, t(M), t(ZM))
 #' ## 0.1171533 0.2192397
 #'
 #' @export
