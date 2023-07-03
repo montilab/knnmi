@@ -122,61 +122,8 @@ SEXP _mutual_inf_cd( SEXP r_input_x, SEXP r_input_y, SEXP k) {
   return( mi );
 }
 
-SEXP _cond_mutual_inf_ccc( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
-  /* R C wrapper for:
-   *  int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
-   *  r_input_x - the vector of continuous target data. size N.
-   *  r_input_y - input vector or matrix. size N or size NxM
-   *  r_input_z - input vector or matrix. size N or size NxM
-   *  k - number of nearest neighbors.
-   *
-   *  The mutual information is returned as a vector of length M.
-   *
-   *  in CaDrA  terms  input_score = x, input_mat=y, expression_score=z
-   */
-  
-  /* declare the output mutual information */
-  SEXP mi;
-  double *p_mi;
-  int  yz_nrows, yz_ncols, k_value ;
-  int j ;
-  double *p_x, *p_y, *p_z ;
-  
-  /* In the R wrapper make sure this is passed as an integer. */
-  k_value = INTEGER(k)[0] ;
-  
-  /* Get the dimensions of r_input_y */
-  /* r_input_z must have the same dimensions, that should all be checked
-   * on the R side. */
-  yz_nrows = Rf_nrows(r_input_y);
-  /* Check if r_input_y is a vector or a matrix. */
-  yz_ncols = 1 ;
-  if (isMatrix(r_input_y)) {
-    /* It's a matrix, get the number of columns */
-    yz_ncols = Rf_ncols(r_input_y);
-  }
-  
-  
-  /* R memory allocation */
-  mi = PROTECT(allocVector(REALSXP, yz_ncols));
-  p_mi = REAL(mi);
-  
-  p_x = REAL(r_input_x) ;
-  p_y = REAL(r_input_y) ;
-  p_z = REAL(r_input_z) ;
-  for (j = 0 ; j < yz_ncols ; j++) {
-    cond_mutual_inf_vec(p_x, &p_y[j * yz_nrows], &p_z[j * yz_nrows], yz_nrows, k_value, &p_mi[j]);
-  }
-  
-  /* Lift R garbage protection */
-  UNPROTECT(1);
-  
-  return( mi );
-}
 
-
-
-SEXP _cond_mutual_inf_cdd( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k) {
+SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP case_) {
   /* R C wrapper for:
    * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
    *  r_input_x - the vector of continuous data. size N.
@@ -190,55 +137,110 @@ SEXP _cond_mutual_inf_cdd( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP 
    */
   
   /* declare the output mutual information */
-  SEXP mi;
+  SEXP mi ;
   double *p_mi;
-  int yz_nrows, yz_ncols, k_value ;
-  double *p_dbl_y, *p_dbl_z ;
-  SEXP dbl_y, dbl_z ;
+  int len_x, num_rows, k_value, case_value ;
+  double *p_buf_y, *p_buf_z ;
   int i, j ;
-  int *p_y, *p_z ;
-  double *p_x ;
+  double *p_x, *p_y, *p_z ;
+  char err_msg[256] ;
   
-  /* In the R wrapper make sure this is passed as an integer. */
+  /* In the R wrapper make sure k is passed as an integer. */
   k_value = INTEGER(k)[0] ;
+  /* Length of x vector */
+  len_x =  Rf_length(r_input_x);
   
-  /* Get the dimensions of r_input_y */
-  /* r_input_z must have the same dimensions, that should all be checked
-   * on the R side. */
-  yz_nrows = Rf_nrows(r_input_y);
-  /* Check if r_input_y is a vector or a matrix. */
-  yz_ncols = 1 ;
-  if (isMatrix(r_input_y)) {
-    /* It's a matrix, get the number of columns */
-    yz_ncols = Rf_ncols(r_input_y);
-  }
-  
-  /* R memory allocation */
-  mi = PROTECT(allocVector(REALSXP, yz_ncols));
-  p_mi = REAL(mi);
-  
-  /* To avoid excess memory usage, loop here and call cond_mutual_inf_vec while
-   * doing integer -> double conversions as the conditional mutual inf. function
-   * is only defined for all-double precision inputs.*/
-  dbl_y = PROTECT(allocVector(REALSXP, yz_nrows));
-  dbl_z = PROTECT(allocVector(REALSXP, yz_nrows));
-  p_dbl_y = REAL(dbl_y) ;
-  p_dbl_z = REAL(dbl_z) ;
-  p_y = INTEGER(r_input_y) ;
-  p_z = INTEGER(r_input_z) ;
+  /* 4 cases: 
+   *  0: y and z are vectors, 
+   *  1: y is a vector, z is a matrix
+   *  2: y is a matrix, z if a vector
+   *  3: y and z are both matrices
+   *  
+   *  With matrices the number of columns matches the
+   *  length of x. As they come from R they're stored in
+   *  column-major format, so they'll be copied row-by-row
+   *  to temporary buffers where needed. 
+   * In the R wrapper make sure case_ is passed as an integer. */
+  case_value = INTEGER(case_)[0] ;
+  /* Check to make sure this is in a valid range */
+  if (case_value < 0 || case_value > 3) {
+    sprintf(err_msg, "value of case argument must be in the range 0-3. Value given: %d", case_value) ;
+    error(err_msg) ;
+  };
+
+  /* Get C pointers to the R data */
+  p_y = REAL(r_input_y) ;
+  p_z = REAL(r_input_z) ;
   p_x = REAL(r_input_x) ;
-  for (j = 0 ; j < yz_ncols ; j++) {
-    /* Convert the jth column of the input y & z to double */
-    for (i = 0 ; i < yz_nrows ; i++) {
-      p_dbl_y[i] = (double) p_y[i + j * yz_nrows] ;
-      p_dbl_z[i] = (double) p_z[i + j * yz_nrows] ;
-    }
-    cond_mutual_inf_vec(p_x, p_dbl_y, p_dbl_z, yz_nrows, k_value, &p_mi[j]);
+
+  /* and....go! */
+  switch (case_value) {
+    case 0:
+      /* R memory allocation for the return vector */
+      mi = PROTECT(allocVector(REALSXP, 1));
+      p_mi = REAL(mi);
+      cond_mutual_inf_vec(p_x, p_y, p_z, len_x, k_value, &p_mi[0]) ;
+      break ;
+    case 1:
+      /* Get the number of rows in the Z matrix */    
+      num_rows = Rf_nrows(r_input_z);
+      /* R memory allocation for the return vector */
+      mi = PROTECT(allocVector(REALSXP, num_rows));
+      p_mi = REAL(mi);
+      /* Get a row buffer */
+      p_buf_z = malloc(len_x * sizeof(double)) ;
+      /* Loop over each row of Z */
+      for (i = 0 ; i < num_rows ; i++) {
+        for (j = 0 ; j < len_x ; j++) {
+          /* Move along the row when the matrix is column-major */
+          p_buf_z[j] = p_z[j * num_rows + i] ;
+        }
+        cond_mutual_inf_vec(p_x, p_y, p_buf_z, len_x, k_value, &p_mi[i]) ; 
+      }
+      free(p_buf_z) ;
+      break ;
+    case 2:
+      /* Get the number of rows in the Y matrix */    
+      num_rows = Rf_nrows(r_input_y);
+      /* R memory allocation for the return vector */
+      mi = PROTECT(allocVector(REALSXP, num_rows));
+      p_mi = REAL(mi);
+      /* Get a row buffer */
+      p_buf_y = malloc(len_x * sizeof(double)) ;
+      /* Loop over each row of Z */
+      for (i = 0 ; i < num_rows ; i++) {
+        for (j = 0 ; j < len_x ; j++) {
+          /* Move along the row when the matrix is column-major */
+          p_buf_y[j] = p_y[j * num_rows + i] ;
+        }
+        cond_mutual_inf_vec(p_x, p_buf_y, p_z, len_x, k_value, &p_mi[i]) ; 
+      }
+      free(p_buf_y);
+      break ;
+    case 3:
+      /* Get the number of rows in one of the matrices */    
+      num_rows = Rf_nrows(r_input_y);
+      
+      /* R memory allocation for the return vector */
+      mi = PROTECT(allocVector(REALSXP, num_rows));
+      p_mi = REAL(mi);
+      /* Get row buffers */
+      p_buf_y = malloc(len_x * sizeof(double)) ;
+      p_buf_z = malloc(len_x * sizeof(double)) ;
+      /* Loop over each row of Z */
+      for (i = 0 ; i < num_rows ; i++) {
+        for (j = 0 ; j < len_x ; j++) {
+          /* Move along the row when the matrix is column-major */
+          p_buf_y[j] = p_y[j * num_rows + i] ;
+          p_buf_z[j] = p_z[j * num_rows + i] ;
+        }
+        cond_mutual_inf_vec(p_x, p_buf_y, p_buf_z, len_x, k_value, &p_mi[i]) ; 
+      }
+      free(p_buf_y) ;
+      free(p_buf_z) ;
+      break ;    
   }
-  
-  /* Lift R garbage protection */
-  UNPROTECT(3);
-  
+  UNPROTECT(1);
   return( mi );
 } 
 

@@ -1,10 +1,15 @@
 #'
-#' Mutual information estimation when the target and features are continuous.
+#' Mutual information estimation MI(X;Y) when the target (X) and features (Y) are continuous.
+#'
+#' This implements the algorithm described in: 
+#' https://doi.org/10.1103/PhysRevE.69.066138
+#' Alexander Kraskov, Harald Stogbauer, and Peter Grassberger
+#' Phys. Rev. E 69, 066138 ?? Published 23 June 2004; Erratum Phys. Rev. E 83, 019903 (2011)
 #'
 #' Compute mutual information of \code{target} and \code{features}
 #' where \code{target} and \code{features} are both continuous
 #' @param target input vector of length N.
-#' @param features input vector of length N or a matrix of size NxM.
+#' @param features input vector of length N or a matrix of size MxN.
 #' @param k number of nearest neighbors.
 #' @useDynLib knnmi _mutual_inf_cc
 #'
@@ -25,8 +30,8 @@ mutual_inf_cc <- function(target, features, k=3L){
   if (is.vector(features)) {
     stopifnot( "target and features vectors must have the same length"=length(target) == length(features) )
   } else {
-    stopifnot( "number of rows in features matrix should be equal to length of target"=
-                 length(target) == nrow(features) )
+    stopifnot( "number of columns in features matrix should be equal to length of the target vector"=
+                 length(target) == ncol(features) )
   }
   stopifnot("k must be less than the length of target"=k < length(target))
   
@@ -35,14 +40,19 @@ mutual_inf_cc <- function(target, features, k=3L){
 }
 
 
+
+#' Mutual information estimation MI(X;Y) when the target (X) is continuous and the
+#' features (Y) are discrete.
 #'
-#' Mutual information estimation when the target is continuous and
-#' the features are discrete.
-#'
+#' This implements the algorithm described in:
+#' https://doi.org/10.1371/journal.pone.0087357
+#' Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. 
+#' PLoS ONE 9(2): e87357. 
+#' 
 #' Compute mutual information of \code{target} and \code{y}
-#' where the \code{target} is continous and \code{features} are discrete.
+#' where the \code{target} is continuous and \code{features} are discrete.
 #' @param target input vector of length N.
-#' @param features input vector of length N or a matrix of size NxM.
+#' @param features input vector of length N or a matrix of size MxN.
 #' @param k number of nearest neighbors.
 #' @useDynLib knnmi _mutual_inf_cd
 #'
@@ -64,8 +74,8 @@ mutual_inf_cd <- function(target, features, k=3L){
   if (is.vector(features)) {
     stopifnot( "target and features vectors must have the same length"=length(target) == length(features) )
   } else {
-    stopifnot( "number of rows in features matrix should be equal to length of target"=
-                 length(target) == nrow(features) )
+    stopifnot( "number of columns in features matrix should be equal to length of target"=
+                 length(target) == ncol(features) )
   }
   stopifnot("k must be less than the length of target"=k < length(target))
   if (!is.integer(features)) {
@@ -76,134 +86,89 @@ mutual_inf_cd <- function(target, features, k=3L){
 }
 
 
-
 #'
-#' Conditional mutual information estimation for continuous case of a vector and matrix, given matrix.
+#' Conditional mutual information estimation CMI(X;Y|Z) where X is a continuous vector.
+#' The input Y and conditional input Z can be vectors or matrices. If Y and Z
+#' are discrete then they must be numeric or integer valued.
 #'
-#' Compute conditional mutual information of vector\code{x}, matrix \code{M}
-#' given matrix\code{Z}
-#' where \code{x}, \code{M} and \code{Z} are all continuous
-#' @param x input vector of size N.
+#' This implements the CMI algorithm described in: 
+#' 
+#' https:doi.org/10.1016/j.eswa.2012.05.014
+#' 
+#' Alkiviadis Tsimpiris, Ioannis Vlachos, Dimitris Kugiumtzis,
+#' Nearest neighbor estimate of conditional mutual information in feature selection,
+#' Expert Systems with Applications,
+#' Volume 39, Issue 16, 2012, Pages 12697-12708
+#' 
+#' @param x vector of size N.
 #' @param M input vector of length N or a matrix of size NxM.
 #' @param Z conditional input vector of length N or a matrix of size NxM.
 #' @param k number of nearest neighbors.
-#' @useDynLib knnmi _cond_mutual_inf_ccc 
+#' @useDynLib knnmi _cond_mutual_inf
 #'
 #' @return a double-precision vector
 #'
 #' @examples
 #' data(mutual_info_df)
 #' set.seed(654321)
-#' cond_mutual_inf_ccc(mutual_info_df$Zc_XcYc,
+#' cond_mutual_inf(mutual_info_df$Zc_XcYc,
 #'                        mutual_info_df$Xc, mutual_info_df$Yc)
 #' ## 0.2936858
 #' 
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
 #' ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
-#' cond_mutual_inf_ccc(mutual_info_df$Zc_XcYcWc, M, ZM)
+#' cond_mutual_inf(mutual_info_df$Zc_XcYcWc, M, ZM)
 #' ## 0.1171533 0.2192397
 #'
 #' @export
-cond_mutual_inf_ccc <- function(x, M, Z, k=3L){
-  # TODO:  We want to make sure that x is a vector,
-  # and the M & Z are both vectors or are both matrices.
-  # Once those types are checked verify correct dimensions.
-  # Best/fastest way in R?!?
+cond_mutual_inf <- function(x, Y, Z, k=3L){
+  # conditional mutual information:  CMI(X, Y|Z)
+  # x: vector of length N
+  # Y: vector of length N or matrix of size MxN
+  # Z: vector of length N or matrix of size MxN
   
-  # Quit if the M & Z types are not the same. 
-  if (xor(is.vector(M),is.vector(Z))) {
-    stop("M and Z must have the same type - numeric vectors or matrices")
-  }
+  # Check that sizes match before continuing. 
+  stopifnot("k must be less than the length of the input vector x"=k < length(x))
   
-  # When they're both vectors make sure their length is the same as x.  
-  if (is.vector(M) && is.vector(Z)) {
-    stopifnot( "x and M must have the same length"=length(x) == length(M) )
+  # The "case" value is used in the C code to let it pick the right code
+  # path without having to re-check for vector vs matrix in C.
+  case <- 0
+  if (is.vector(Y) && is.vector(Z)) {
+    # When they're both vectors make sure their length is the same as x.  
+    stopifnot( "x and Y must have the same length"=length(x) == length(Y) )
     stopifnot( "x and Z must have the same length"=length(x) == length(Z) )
-    stopifnot("k must be less than the length of input vectors"=k < length(x))
-  } else { # Both are matrices.
-    stopifnot( "M must be a matrix"= (class(M)[1]=="matrix"))
-    stopifnot( "Z must be a matrix"= (class(Z)[1]=="matrix"))
-    stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
-    stopifnot( "x and Z must have the same length"=length(x) == nrow(Z) )
-    stopifnot( "M and Z must be the same size"=dim(M) == dim(Z) )
-    stopifnot("k must be less than the length of x"=k < length(x))
-  }
-  res <- .Call('_cond_mutual_inf_ccc', x, M, Z, as.integer(k))
-  res
-}
-
-
-#'
-#' Conditional mutual information estimation for a continuous vector
-#' and a discrete matrix, given another discrete matrix.
-#'
-#' Compute conditional mutual information of \code{x},\code{M} given \code{Z}
-#' where \code{x} is continuous, \code{M} and \code{Z} are discrete
-#' @param x input vector of size N.
-#' @param M input integer vector of length N or a matrix of size NxM.
-#' @param Z conditional input integer vector of length N or a matrix of size NxM.
-#' @param k number of nearest neighbors.
-#' @useDynLib knnmi _cond_mutual_inf_cdd
-#'
-#'
-#' @return a double-precision vector - mutual information estimation for
-#' vector \code{x} and matrix \code{M}, given matrix \code{Z}.
-#'
-#' @examples
-#' data(mutual_info_df)
-#' set.seed(654321)
-#' cond_mutual_inf_cdd(mutual_info_df$Zc_XdYd, mutual_info_df$Xd,
-#'                   mutual_info_df$Yd)
-#' ## 0.1338664
-#' 
-#' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
-#' ZM <- cbind(mutual_info_df$Yd, mutual_info_df$Wd)
-#' cond_mutual_inf_cdd(mutual_info_df$Zc_XdYdWd, M, ZM)
-#' ## 0.1757598 0.1086227
-#'
-#' @export
-cond_mutual_inf_cdd <- function(x, M, Z, k=3L){
-
-  # TODO:  We want to make sure that x is a vector,
-  # and the M & Z are both vectors or are both matrices.
-  # Once those types are checked verify correct dimensions.
-  # Best/fastest way in R?!?
-  
-  # Quit if the M & Z types are not the same. 
-  if (xor(is.vector(M),is.vector(Z))) {
-    stop("M and Z must have the same type - numeric vectors or matrices")
-  }
-  
-  # When they're both vectors make sure their length is the same as x.  
-  if (is.vector(M) && is.vector(Z)) {
-    stopifnot( "x and M must have the same length"=length(x) == length(M) )
+  } else if (is.vector(Y) && is.matrix(Z)) {
+    case <- 1
+    # mixed vector & matrix
+    stopifnot( "x and Y must have the same length"=length(x) == length(Y) )
+    stopifnot( "Number of Z columns must be the same as the length of x"=length(x) == ncol(Z) )
+  } else if (is.vector(Z) && is.matrix(Y)) {
+    # mixed vector & matrix
+    case <- 2
     stopifnot( "x and Z must have the same length"=length(x) == length(Z) )
-    stopifnot("k must be less than the length of input vectors"=k < length(x))
-  } else { # Both are matrices.
-    stopifnot( "M must be a matrix"= (class(M)[1]=="matrix"))
-    stopifnot( "Z must be a matrix"= (class(Z)[1]=="matrix"))
-    stopifnot( "x and M must have the same length"=length(x) == nrow(M) )
-    stopifnot( "x and Z must have the same length"=length(x) == nrow(Z) )
-    stopifnot( "M and Z must be the same size"=dim(M) == dim(Z) )
-    stopifnot("k must be less than the length of x"=k < length(x))
+    stopifnot( "Number of Y columns must be the same as the length of x"=length(x) == ncol(Y) )    
+  }  else if (is.matrix(Z) && is.matrix(Y)) {
+    # Both Y and Z are matrices.
+    case <- 3
+    stopifnot( "x and Y must have the same length"=length(x) == ncol(Y) )
+    stopifnot( "x and Z must have the same length"=length(x) == ncol(Z) )
+    stopifnot( "Y and Z must be the same size"=dim(Y) == dim(Z) )
+  } else {
+    # Incorrect arguments...
+    stop("Y and Z must be vectors or matrices of the correct dimensionality.")
   }
-
-  # TODO: i the R data type of M&Z is numeric, this should
-  # just return the call to cond_mutual_inf_ccc. 
-  # If they're both integers it should proceed and call the C interface
-  # function _cond_mutual_inf_cdd which handles the integer->double
-  # conversion on a column-by-column basis.
-  if (!is.integer(M)) {
-    #M <- matrix(as.integer(M), nrow=nrow(M))
-    # storage.mode appears to be 5x faster...
-    storage.mode(M) <- "integer"
+  # If any of the input arguments are not double precision, convert them.
+  if (!is.double(x)) {
+    storage.mode(x) <- "double"
   }
-  if (!is.integer(Z)) {
-   # Z <- matrix(as.integer(Z), nrow=nrow(Z))
-    storage.mode(Z) <- "integer"
+  if (!is.double(Y)) {
+    storage.mode(Y) <- "double"
   }
-
-  res <- .Call('_cond_mutual_inf_cdd', x, M, Z, as.integer(k))
+  if (!is.double(Z)) {
+    storage.mode(Z) <- "double"
+  }
+  
+  res <- .Call('_cond_mutual_inf', x, Y, Z, as.integer(k), as.integer(case))
   res
 }
 
