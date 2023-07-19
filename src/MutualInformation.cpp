@@ -29,10 +29,10 @@ MutualInformation::~MutualInformation() {}
 double MutualInformation::compute(const ArrayXd &x, const ArrayXd& y) {
   // compute mutual information based on k-nearest neighbors
   // This implements the algorithm described in: https://doi.org/10.1103/PhysRevE.69.066138
-  // Alexander Kraskov, Harald Stogbauer, and Peter Grassberger
-  // Phys. Rev. E 69, 066138 ?? Published 23 June 2004; Erratum Phys. Rev. E 83, 019903 (2011)
+  // Alexander Kraskov, Harald Stögbauer, and Peter Grassberger
+  // Phys. Rev. E 69, 066138 (2004).
   
-  // Creat a KD-tree using nanoflann and its Eigen matrix adapter
+  // Create a KD-tree using nanoflann and its Eigen matrix adapter
   // Store the size of the vectors for easy reference
   
   auto N = x.size() ;
