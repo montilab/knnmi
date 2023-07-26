@@ -50,13 +50,15 @@ namespace CaDrA {
 
     protected:
         int m_k ;
-        // Scale and noise-ify vectors
-        virtual ArrayXd scale(const ArrayXd &x, bool add_noise=true) const;
+        //  noise-ify vectors
+        virtual ArrayXd add_noise(const ArrayXd &x) const;
         // digamma function
-        double digamma_f(const double x) const ;
-        // Compute the sum of digamma_f functions as nearest neighbors are calculated.  
+        vector<double> digamma_vec(vector<double> counts) const ;
+        
+        // Get the number of nearest neighbors for all points.
         // Used in both the MutualInformation and CondMutualInformation subclasses.
-        virtual double sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) ;
+        virtual vector<double> count_neighbors(MapArrayConst &vec, const vector<double> &dists) ;
+
     };
 
 } // CaDrA

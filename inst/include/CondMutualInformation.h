@@ -39,7 +39,7 @@ namespace CaDrA {
         virtual double sum_digamma_from_neighbors(MapArrayConst &vec1, MapArrayConst &vec2, const vector<double> &dists) ;
 
         // Calculate distances and nearest neighbors in 3D.
-        pair<vector<double>,vector<long>>  calc_distances3d(const long N, const Array3col &tmp_mat) const;
+        vector<double> calc_distances3d(const long N, const Array3col &tmp_mat) const;
     };
 
 } // CaDrA

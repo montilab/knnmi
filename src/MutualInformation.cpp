@@ -10,6 +10,8 @@
 #include <list>
 #include <set>
 #include <map>
+#include <functional> 
+#include <algorithm>
 
 #include <Rmath.h>
 #include "R.h"
@@ -25,7 +27,7 @@ MutualInformation::MutualInformation(const int mK) : MutualInformationBase(mK) {
 MutualInformation::~MutualInformation() {}
 
  
-
+ 
 double MutualInformation::compute(const ArrayXd &x, const ArrayXd& y) {
   // compute mutual information based on k-nearest neighbors
   // This implements the algorithm described in: https://doi.org/10.1103/PhysRevE.69.066138
@@ -38,30 +40,36 @@ double MutualInformation::compute(const ArrayXd &x, const ArrayXd& y) {
   auto N = x.size() ;
   
   Array2col  tmp_mat(N, 2) ;
-  tmp_mat.col(0) = scale(x) ;
-  tmp_mat.col(1) = scale(y) ;
+  tmp_mat.col(0) = add_noise(x) ;
+  tmp_mat.col(1) = add_noise(y) ;
   // Map the double array pointer to an Eigen vector without a copy.
   MapArrayConst x_scale(tmp_mat.col(0).data(), N) ;
   MapArrayConst y_scale(tmp_mat.col(1).data(), N) ;
   
-  vector<double> dists  = calc_distances2d(N, tmp_mat).first;
-  
-  double x_digamma_sum = sum_digamma_from_neighbors(x_scale, dists) ;
-  double y_digamma_sum = sum_digamma_from_neighbors(y_scale, dists) ;
+  vector<double> dists  = calc_distances2d(N, tmp_mat) ;
+   
+  auto x_calc = count_neighbors(x_scale, dists) ;
+  x_calc = digamma_vec(x_calc) ;
+  double x_digamma_sum = std::accumulate(x_calc.begin(), x_calc.end(), 0.0, std::plus<double>());
+
+  auto y_calc = count_neighbors(y_scale, dists) ;
+  y_calc = digamma_vec(y_calc) ;
+  double y_digamma_sum = std::accumulate(y_calc.begin(), y_calc.end(),0.0, std::plus<double>());
   
   // mutual info computation
-  double mi = digamma_f(N) + digamma_f(m_k) - (x_digamma_sum + y_digamma_sum) / N;
+  double Nd = N ;
+  double mi = digamma(Nd) + digamma(m_k) - (x_digamma_sum + y_digamma_sum) / Nd;
   
   // Can't return less than 0.
   return std::max(0.0,mi) ;
 }
 
-
-
-pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long N, 
-                                                                      const Array2col &tmp_mat) const {
+vector<double> MutualInformation::calc_distances2d(const long N, const Array2col &tmp_mat) const {
   // Calculate the Chebyshev distances and numbers of neighbors for the 2D array tmp_mat.
-  kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
+  // Adjust the max size of leaves in the kd-tree if you want, 10 is the default.
+  int leaf_max_size = 10 ;
+  kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),leaf_max_size) ;
+  
   // We want N neighbors in addition to the point itself so
   // add 1 to the # of neighbors.
   int real_k = m_k + 1 ;
@@ -76,19 +84,20 @@ pair<vector<double>,vector<long>> MutualInformation::calc_distances2d(const long
   for (long i = 0 ; i < N ; ++i) {
     // store indexes and distances
     vector<Eigen::Index> ret_indexes(real_k, 0.0);
-    vector<double> out_dists_sqr(real_k,0.0);
+    vector<double> out_dists(real_k,0.0);
     
     query_pt[0] = tmp_mat(i, 0);
     query_pt[1] = tmp_mat(i, 1);
     
     neighbors[i] = mat_index.index->knnSearch(&query_pt[0], real_k,
-                                              &ret_indexes[0], &out_dists_sqr[0]) ;
-    out_dists_sqr.resize(neighbors[i]) ;
-    auto max_dist= std::nextafter(*max_element(std::begin(out_dists_sqr), std::end(out_dists_sqr)),0.0)  ; // following sklearn
-    dists[i] = max_dist ;
+                                              &ret_indexes[0], &out_dists[0]) ;
+    out_dists.resize(neighbors[i]) ;
+    dists[i] = std::nextafter(*max_element(std::begin(out_dists), std::end(out_dists)),0.0)  ;  
   }
-  return make_pair(dists,neighbors) ;
+  return dists ;
 }
+
+
 
 
 } // CaDrA

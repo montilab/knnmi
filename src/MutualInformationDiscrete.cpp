@@ -29,11 +29,10 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
   // discrete vector y.
   // This implements the algorithm described in: https://doi.org/10.1371/journal.pone.0087357
   // Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357. 
-  
   auto N = x.size() ;
-  ArrayXd x_scale = scale(x) ;
+  ArrayXd x_noise = add_noise(x) ;
   // Make a kdtree for x_scale, it'll be needed later.
-  kd_tree_1d xscale_index_tree(1, x_scale, 10);
+  kd_tree_1d xnoise_index_tree(1, x_noise, 10);
   
   // Chebyshev distance
   ArrayXd dists(N) ;
@@ -77,7 +76,7 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
       }
       // Use Eigen 3.4's method of providing a vector of indices
       // to produce a sub-vector.
-      ArrayXd masked_x = x_scale(label_indices) ;
+      ArrayXd masked_x = x_noise(label_indices) ;
       // Make a lookup tree for the points of this label.
       kd_tree_1d label_index_tree(1, masked_x, 10);
       // Get all of the distances for each point for this label.
@@ -96,7 +95,7 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
         auto max_dist = out_dists.back() ;
         
         std::vector<std::pair<Eigen::Index, double>> ret_matches;
-        m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, 
+        m_all.push_back(xnoise_index_tree.index->radiusSearch(query_pt, 
                                                               max_dist, 
                                                               ret_matches , 
                                                               nanoflann::SearchParams(10))) ;
@@ -104,17 +103,17 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
     }
   }
   double N_mod = all_indices.size() ;
-  double digamma_N = digamma_f(N) ;
+  double digamma_N = digamma(N) ;
   // Calculate the mean of digammas over the count of samples for each label.
   double digamma_labels = std::accumulate(label_counts.begin(),label_counts.end(),0.0,
                                           [&](double m, double n){ return m + 
-                                            digamma_f(n) * n / N_mod ; } ) ;
+                                            digamma(n) * n / N_mod ; } ) ;
   // Get the same for the k's used at each label.
   double digamma_k = std::accumulate(k_all.begin(),k_all.end(),0.0,
                                      [&](double m, vector<double> &n){ return m +
-                                       digamma_f(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
+                                       digamma(std::max(n[1] - 1.0, 1.0)) * n[0] / N_mod; } ) ;
   double digamma_m = std::accumulate(m_all.begin(),m_all.end(), 0.0,  
-                                     [&](double m, double n){return m + digamma_f(n); });
+                                     [&](double m, double n){return m + digamma(n); });
   digamma_m = digamma_m / N_mod ;
   
   // mutual info computation
@@ -124,38 +123,5 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
 }
 
 
-pair<vector<double>,vector<long>> MutualInformationDiscrete::calc_distances2d(const long N, 
-                                                                      const Array2col &tmp_mat) const {
-  // Calculate the Chebyshev distances and numbers of neighbors for the 2D array tmp_mat.
-  kd_tree_2d mat_index(tmp_mat.cols(),std::cref(tmp_mat),20) ;
-  // We want N neighbors in addition to the point itself so
-  // add 1 to the # of neighbors.
-  int real_k = m_k + 1 ;
-  
-  // Chebyshev distance
-  vector<double> dists(N) ;
-  // Number of neighbors
-  vector<long> neighbors(N) ;
-  
-  // a query point.
-  array<double,2> query_pt ;
-  for (long i = 0 ; i < N ; ++i) {
-    // store indexes and distances
-    vector<Eigen::Index> ret_indexes(real_k, 0.0);
-    vector<double> out_dists_sqr(real_k,0.0);
-    
-    query_pt[0] = tmp_mat(i, 0);
-    query_pt[1] = tmp_mat(i, 1);
-    
-    neighbors[i] = mat_index.index->knnSearch(&query_pt[0], real_k,
-                                              &ret_indexes[0], &out_dists_sqr[0]) ;
-    out_dists_sqr.resize(neighbors[i]) ;
-    // following sklearn...
-    auto max_dist= std::nextafter(*max_element(std::begin(out_dists_sqr), std::end(out_dists_sqr)),0.0)  ; 
-    dists[i] = max_dist ;
-  }
-  return make_pair(dists,neighbors) ;
-}
-
-
+ 
 } // CaDrA

@@ -32,11 +32,10 @@ public:
   
   //  Computes the Mutual Information of 2 continuous variables.
   virtual double compute(const ArrayXd &x, const ArrayXd& y) ;
- 
   
 protected:
-  // Calculate distances and nearest neighbors in 2D.
-  pair<vector<double>,vector<long>>  calc_distances2d(const long N, const Array2col &tmp_mat) const;
+  // Calculate distances in 2D.  
+  vector<double>  calc_distances2d(const long N, const Array2col &tmp_mat) const;
 };
 
 } // CaDrA

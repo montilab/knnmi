@@ -10,7 +10,7 @@ test_that("cond_mutual_inf returns expected result - mat/mat", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.1171533, 0.2192397), tolerance = 0.000001)
+  expect_equal(result, c(0.1700470, 0.2146169), tolerance = 0.000001)
   
 })
 
@@ -29,14 +29,14 @@ test_that("cond_mutual_inf returns expected result - vec/mat", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.1171533, 0.2029773), tolerance = 0.000001)
+  expect_equal(result, c(0.170047, 0.192165), tolerance = 0.000001)
   
   tM2 <- c(tM[2,1:ncol(tM)])
   result <- cond_mutual_inf(mutual_info_df$Zc_XcYcWc, tM2, tZM)
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c( 0.035512432, 0.219239735), tolerance = 0.000001)  
+  expect_equal(result, c( 0.07116011, 0.21461691), tolerance = 0.000001)  
   
 })
 
@@ -56,14 +56,14 @@ test_that("cond_mutual_inf returns expected result - mat/vec", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.11715329, 0.02990735), tolerance = 0.000001)
+  expect_equal(result, c(0.17004698, 0.08443253), tolerance = 0.000001)
   
   tZM2 <- c(tZM[2,1:ncol(tZM)])
   result <- cond_mutual_inf(mutual_info_df$Zc_XcYcWc, tM, tZM2)
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.2029773, 0.2192397), tolerance = 0.000001)  
+  expect_equal(result, c(0.1921650, 0.2146169), tolerance = 0.000001)  
   
 })
 
@@ -76,7 +76,7 @@ test_that("cond_mutual_inf  returns expected result - vec/vec", {
                              mutual_info_df$Xc, mutual_info_df$Yc)
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.2936858, tolerance = 0.00001)
+  expect_equal(result, 0.2885244, tolerance = 0.00001)
   
 })
 
@@ -122,7 +122,7 @@ test_that("cond_mutual_inf returns expected result - integer mat/mat", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.1757598, 0.1086227), tolerance = 0.000001)
+  expect_equal(result, c(0.1865964, 0.1117353), tolerance = 0.000001)
   
 })
 
@@ -140,14 +140,14 @@ test_that("cond_mutual_inf returns expected result - integer vec/mat", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.17575981, 0.19006222), tolerance = 0.000001)
+  expect_equal(result, c( 0.1865964, 0.2070891), tolerance = 0.000001)
   
   tM2 <- c(tM[2,1:ncol(tM)])
   result <- cond_mutual_inf(mutual_info_df$Zc_XdYdWd, tM2, tZM)
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.0000000, 0.1086227), tolerance = 0.000001)  
+  expect_equal(result, c(0.0000000, 0.1107099), tolerance = 0.000001)  
 
 })
 
@@ -165,14 +165,14 @@ test_that("cond_mutual_inf returns expected result - integer mat/vec", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.1757598, 0.0000000), tolerance = 0.000001)
+  expect_equal(result, c(0.1865964 , 0.0000000), tolerance = 0.000001)
   
   tZM2 <- c(tZM[2,1:ncol(tZM)])
   result <- cond_mutual_inf(mutual_info_df$Zc_XdYdWd, tM, tZM2)
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.1904468, 0.1086227), tolerance = 0.000001)  
+  expect_equal(result, c(0.2051468, 0.1107099), tolerance = 0.000001)  
   
 })
 
@@ -191,7 +191,7 @@ test_that("cond_mutual_inf returns expected result - integer vec/vec", {
   
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.1757598, tolerance = 0.00001)
+  expect_equal(result, 0.1865964, tolerance = 0.00001)
   
   tM2 <- c(tM[2,1:ncol(tM)])
   tZM2 <- c(tZM[2,1:ncol(tZM)])
@@ -199,7 +199,7 @@ test_that("cond_mutual_inf returns expected result - integer vec/vec", {
   
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.1086227, tolerance = 0.00001) 
+  expect_equal(result, 0.1117353, tolerance = 0.00001) 
   
 })
 

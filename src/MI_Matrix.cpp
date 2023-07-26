@@ -16,8 +16,6 @@
 #include <limits>
 #include <stdexcept>
 
-#include <iostream>
-
 #include "MutualInformation.h"
 #include "MutualInformationDiscrete.h"
 #include "CondMutualInformation.h"
@@ -57,7 +55,7 @@ int mutual_inf_cd_vec(const double *input_x, const int *input_y, const int n_ele
     CaDrA::MapArrayConst x_eig(input_x,n_elems) ;
     CaDrA::MapArrayIConst y_eig(input_y,n_elems) ;
 
-    mi[0] = mut_inf.compute(x_eig, y_eig);
+    *mi = mut_inf.compute(x_eig, y_eig);
     return 0 ;
 }
 
@@ -72,7 +70,7 @@ int cond_mutual_inf_vec(const double *input_x,  const double *input_y, const dou
     CaDrA::MapArrayConst x_eig(input_x,n_elems) ;
     CaDrA::MapArrayConst y_eig(input_y,n_elems) ;
     CaDrA::MapArrayConst z_eig(input_z,n_elems) ;
-    mi[0] = mut_inf.compute(x_eig, y_eig, z_eig);
+    *mi = mut_inf.compute(x_eig, y_eig, z_eig);
     return 0 ;
 }
 

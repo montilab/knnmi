@@ -20,10 +20,9 @@
 #' data(mutual_info_df)
 #' set.seed(654321)
 #' mutual_inf_cc(mutual_info_df$Xc, t(mutual_info_df$Zc_XcYc))
-#' ## 0
-#'
+#' 
 #' mutual_inf_cc(mutual_info_df$Yc, t(mutual_info_df$Zc_XcYc))
-#' ## 0.2738658
+#' 
 #'
 #' @export
 mutual_inf_cc <- function(target, features, k=3L){
@@ -71,11 +70,10 @@ mutual_inf_cc <- function(target, features, k=3L){
 #' data(mutual_info_df)
 #' set.seed(654321)
 #' mutual_inf_cd(mutual_info_df$Zc_XdYd, t(mutual_info_df$Xd))
-#' ## 0.128029
-#'
+#' 
 #' M <- cbind(mutual_info_df$Xd, mutual_info_df$Yd)
 #' mutual_inf_cd(mutual_info_df$Zc_XdYdWd, t(M))
-#' ## 0.1070804 0.1041177
+#' 
 #' 
 #' @export
 mutual_inf_cd <- function(target, features, k=3L){
@@ -130,12 +128,11 @@ mutual_inf_cd <- function(target, features, k=3L){
 #' set.seed(654321)
 #' cond_mutual_inf(mutual_info_df$Zc_XcYc,
 #'                        mutual_info_df$Xc, t(mutual_info_df$Yc))
-#' ## 0.2936858
 #' 
 #' M <- cbind(mutual_info_df$Xc, mutual_info_df$Yc)
 #' ZM <- cbind(mutual_info_df$Yc, mutual_info_df$Wc)
 #' cond_mutual_inf(mutual_info_df$Zc_XcYcWc, t(M), t(ZM))
-#' ## 0.1171533 0.2192397
+#'
 #'
 #' @export
 cond_mutual_inf <- function(X, Y, Z, k=3L){
