@@ -39,62 +39,50 @@ void MutualInformationBase::set_k(int mK) {
 }
  
 
-ArrayXd MutualInformationBase::add_noise(const ArrayXd &x) const {
-  // Scale the vector x by its standard deviation. Add a bit of random 
+ArrayXd MutualInformationBase::scale(const ArrayXd &x, const bool add_noise) const {
+  // Center and scale the vector x by its standard deviation. Add a bit of random 
   // noise.
-  /*auto size_v = x.size() ;
-  double mean_x = x.mean() ;
-  double sum = 0.0 ;
-  for (auto i = 0 ; i < size_v ; i++) {
-    double tmp = x[i] - mean_x ;
-    sum += tmp * tmp ;
-  }
-  double std_dev = std::sqrt(sum / (size_v-1)) ;
-  ArrayXd x_scale = (x - mean_x)  / std_dev ;*/
+  auto size_v = x.size() ;
+  double mean_x = x.mean() ; 
+  
+  ArrayXd x_scale = x - mean_x ;
+  double std_dev = std::sqrt(x_scale.pow(2).sum() / (size_v-1)) ;
+  
+  x_scale = x_scale  / std_dev ; 
   
   // add a wee bit of noise as suggested in
   // Kraskov et. al. 2004.
-  //if (add_noise) {
-  ArrayXd x_noise = x ;
-  double mean_xs = x.mean() ;
-  // Get a uniform value from the R RNG
-  // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
-  for (auto i = 0 ; i < x.size() ; i++) {
-    x_noise[i] += 1e-10 * mean_xs * unif_rand();
+  if (add_noise) {
+    // Get a uniform value from the R RNG
+    // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
+    for (auto i = 0 ; i < x.size() ; i++) {
+      x_scale[i] += 1e-10 * mean_x * unif_rand();
+    }
   }
-  //}
-  return x_noise;
+  return x_scale;
 }
 
-vector<double> MutualInformationBase::count_neighbors(MapArrayConst &vec, const vector<double> &dists) {
+ 
+
+double MutualInformationBase::sum_digamma_from_neighbors(MapArrayConst &vec, const vector<double> &dists) {
   // This one is called from mutual_information_cc and cond_mutual_information for the neighbors
   // for a single vector.
   long N = dists.size() ;
-  vector<double> neighbors(N,0) ;
-
-  // KD-Tree for this vector. L1 distance is identical to the Chebyshev distance in 1D. 
+  double sum = 0.0 ;
+  
+  // KD-Tree for this vector
   nanoflann::KDTreeEigenMatrixAdaptor<MapArrayConst,-1,nanoflann::metric_L1> vec_tree(1, vec) ;
   
   std::vector<std::pair<Eigen::Index, double>> ret_matches;
-  ret_matches.reserve(dists.size());
-  
   for (long i = 0 ; i < N ; ++i) {
     double pt = vec(i) ; // avoids type issues with the compiler and the radiusSearch.
-    double radius_count = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches, nanoflann::SearchParams());
-    neighbors[i] = radius_count ;
+    double tmp = vec_tree.index->radiusSearch(&pt, dists[i] , ret_matches , nanoflann::SearchParams(10));
+    sum += digamma(tmp) ;
     ret_matches.clear() ;
   }
-  return neighbors ;
+  return sum ;
 }
 
-
-// Calls R's digamma function for all elements of a vector.
-vector<double> MutualInformationBase::digamma_vec(vector<double> counts) const {
-    vector<double> result(counts.size()) ;
-    std::transform (counts.begin(), counts.end(), result.begin(), digamma);
-    return result ;
-}
- 
  
  
 // placeholder

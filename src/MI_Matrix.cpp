@@ -20,6 +20,7 @@
 #include "MutualInformationDiscrete.h"
 #include "CondMutualInformation.h"
 
+
 int mutual_inf_cc_vec(const double *input_x, const double *input_y, const int n_elems,  
                       const int k, double *mi) {
     // Case all continuous input_y or mixed discrete/continuous
@@ -61,6 +62,7 @@ int mutual_inf_cd_vec(const double *input_x, const int *input_y, const int n_ele
 
 int cond_mutual_inf_vec(const double *input_x,  const double *input_y, const double *input_z, 
                         const int n_elems, const int k, double *mi) {
+  
     // Conditional mutual information for a single vector of x,y,and z
     // input_x, input_y, input_z - input vectors, all of size n_elems.
     // k - number of nearest neighbors

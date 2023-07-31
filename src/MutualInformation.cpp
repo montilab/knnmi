@@ -40,21 +40,16 @@ double MutualInformation::compute(const ArrayXd &x, const ArrayXd& y) {
   auto N = x.size() ;
   
   Array2col  tmp_mat(N, 2) ;
-  tmp_mat.col(0) = add_noise(x) ;
-  tmp_mat.col(1) = add_noise(y) ;
+  tmp_mat.col(0) = scale(x) ;
+  tmp_mat.col(1) = y ;
   // Map the double array pointer to an Eigen vector without a copy.
   MapArrayConst x_scale(tmp_mat.col(0).data(), N) ;
   MapArrayConst y_scale(tmp_mat.col(1).data(), N) ;
   
   vector<double> dists  = calc_distances2d(N, tmp_mat) ;
-   
-  auto x_calc = count_neighbors(x_scale, dists) ;
-  x_calc = digamma_vec(x_calc) ;
-  double x_digamma_sum = std::accumulate(x_calc.begin(), x_calc.end(), 0.0, std::plus<double>());
-
-  auto y_calc = count_neighbors(y_scale, dists) ;
-  y_calc = digamma_vec(y_calc) ;
-  double y_digamma_sum = std::accumulate(y_calc.begin(), y_calc.end(),0.0, std::plus<double>());
+ 
+  double x_digamma_sum = sum_digamma_from_neighbors(x_scale,dists) ;
+  double y_digamma_sum = sum_digamma_from_neighbors(y_scale,dists) ;
   
   // mutual info computation
   double Nd = N ;

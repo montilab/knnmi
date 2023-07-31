@@ -135,7 +135,7 @@ mutual_inf_cd <- function(target, features, k=3L){
 #'
 #'
 #' @export
-cond_mutual_inf <- function(X, Y, Z, k=3L){
+cond_mutual_inf <- function(X, Y, Z, discrete_y=TRUE, discrete_Z=TRUE ,k=3L){
   # conditional mutual information:  CMI(X, Y|Z)
   # X: vector of length N
   # Y: vector of length N or matrix of size MxN
@@ -171,7 +171,7 @@ cond_mutual_inf <- function(X, Y, Z, k=3L){
     # Incorrect arguments...
     stop("Y and Z must be vectors or matrices of the correct dimensionality.")
   }
-  # If any of the input arguments are not double precision, convert them.
+  
   if (!is.double(X)) {
     storage.mode(X) <- "double"
   }
@@ -182,7 +182,7 @@ cond_mutual_inf <- function(X, Y, Z, k=3L){
     storage.mode(Z) <- "double"
   }
   
-  res <- .Call('_cond_mutual_inf', X, Y, Z, as.integer(k), as.integer(case))
+  res <- .Call('_cond_mutual_inf', X, Y, Z, as.integer(k), as.integer(case) )
   res
 }
 

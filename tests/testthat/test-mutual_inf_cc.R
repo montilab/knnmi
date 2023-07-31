@@ -8,12 +8,12 @@ test_that("mutual_inf_cc returns expected result", {
   
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.004018292, 0.141716230), tolerance = 0.000001)
+  expect_equal(result, c(0.0000000, 0.1979224), tolerance = 0.000001)
   
   result <- mutual_inf_cc(mutual_info_df$Zc_XcYcWc, t(M), k=4)
   expect_length(result, 2L)
   expect_type(result, "double")
-  expect_equal(result, c(0.0000000, 0.1742722), tolerance = 0.000001)  
+  expect_equal(result, c(0.0000000, 0.1385266), tolerance = 0.000001)  
   
 })
 
@@ -47,12 +47,12 @@ test_that("mutual_inf_cc returns expected result", {
   result <- mutual_inf_cc(mutual_info_df$Xc, t(mutual_info_df$Zc_XcYc),k=5)
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.01913027, tolerance = 0.00001)
+  expect_equal(result, 0.02452713, tolerance = 0.00001)
   
   result <- mutual_inf_cc(mutual_info_df$Yc, t(mutual_info_df$Zc_XcYc))
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.3694439, tolerance = 0.00001)
+  expect_equal(result, 0.3621656, tolerance = 0.00001)
 })
 
 test_that("mutual_inf_cc returns expected result with seed", {
@@ -67,7 +67,7 @@ test_that("mutual_inf_cc returns expected result with seed", {
   result <- mutual_inf_cc(x, y, k=3)
   expect_length(result, 1L)
   expect_type(result, "double")
-  expect_equal(result, 0.436855, tolerance = 0.00001)
+  expect_equal(result, 0.1582886, tolerance = 0.00001)
 })
 
 

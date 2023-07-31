@@ -161,7 +161,7 @@ SEXP _mutual_inf_cd( SEXP r_input_x, SEXP r_input_y, SEXP k) {
 
 SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, SEXP case_) {
   /* R C wrapper for:
-   * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, double *mi) ;
+   * int cond_mutual_inf( double *input_x,  int x_elems,  double *input_y,  double *input_z,  int nrows,  int ncols,  int k, int int_y, int int_z, double *mi) ;
    *  r_input_x - the vector of continuous data. size N.
    *  r_input_y - integer vector or matrix. size N or size NxM
    *  r_input_z - integer vector or matrix. size N or size NxM

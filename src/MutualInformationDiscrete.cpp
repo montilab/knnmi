@@ -30,9 +30,9 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
   // This implements the algorithm described in: https://doi.org/10.1371/journal.pone.0087357
   // Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357. 
   auto N = x.size() ;
-  ArrayXd x_noise = add_noise(x) ;
+  ArrayXd x_scale = scale(x) ;
   // Make a kdtree for x_scale, it'll be needed later.
-  kd_tree_1d xnoise_index_tree(1, x_noise, 10);
+  kd_tree_1d xscale_index_tree(1, x_scale, 10);
   
   // Chebyshev distance
   ArrayXd dists(N) ;
@@ -76,7 +76,7 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
       }
       // Use Eigen 3.4's method of providing a vector of indices
       // to produce a sub-vector.
-      ArrayXd masked_x = x_noise(label_indices) ;
+      ArrayXd masked_x = x_scale(label_indices) ;
       // Make a lookup tree for the points of this label.
       kd_tree_1d label_index_tree(1, masked_x, 10);
       // Get all of the distances for each point for this label.
@@ -95,7 +95,7 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
         auto max_dist = out_dists.back() ;
         
         std::vector<std::pair<Eigen::Index, double>> ret_matches;
-        m_all.push_back(xnoise_index_tree.index->radiusSearch(query_pt, 
+        m_all.push_back(xscale_index_tree.index->radiusSearch(query_pt, 
                                                               max_dist, 
                                                               ret_matches , 
                                                               nanoflann::SearchParams(10))) ;

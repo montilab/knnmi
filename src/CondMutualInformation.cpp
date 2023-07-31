@@ -41,9 +41,9 @@ double CondMutualInformation::compute(const ArrayXd &x, const ArrayXd& y, const 
   
   Array3col tmp_mat(N, 3) ;
   
-  tmp_mat.col(0) = add_noise(x) ;
-  tmp_mat.col(1) = add_noise(y) ;
-  tmp_mat.col(2) = add_noise(z) ;
+  tmp_mat.col(0) = scale(x) ;
+  tmp_mat.col(1) = y ;  
+  tmp_mat.col(2) = z ;
   
   // Calculating the distances also calculates the number of neighbors, so
   // calc_distances2 returns both.
@@ -56,10 +56,8 @@ double CondMutualInformation::compute(const ArrayXd &x, const ArrayXd& y, const 
   MapArrayConst z_scale(tmp_mat.col(2).data(), N) ;
 
   // The z-projection is done using the same approach used in MutualInformation
-  auto z_calc = count_neighbors(z_scale, dists) ;
-  z_calc = digamma_vec(z_calc) ;
-  double z_digamma_sum = std::accumulate(z_calc.begin(), z_calc.end(), 0.0, std::plus<double>());
-  
+  double z_digamma_sum = MutualInformationBase::sum_digamma_from_neighbors(z_scale, dists) ;
+
   // and for the 2D neighbors use the local function.
   double xz_digamma_sum = sum_digamma_from_neighbors(x_scale, z_scale, dists) ;
   double yz_digamma_sum = sum_digamma_from_neighbors(y_scale, z_scale, dists) ;
