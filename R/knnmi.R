@@ -135,7 +135,7 @@ mutual_inf_cd <- function(target, features, k=3L){
 #'
 #'
 #' @export
-cond_mutual_inf <- function(X, Y, Z, discrete_y=TRUE, discrete_Z=TRUE ,k=3L){
+cond_mutual_inf <- function(X, Y, Z, k=3L){
   # conditional mutual information:  CMI(X, Y|Z)
   # X: vector of length N
   # Y: vector of length N or matrix of size MxN
