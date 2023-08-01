@@ -30,7 +30,8 @@ double MutualInformationDiscrete::compute(const ArrayXd &x, const ArrayXi &y) {
   // This implements the algorithm described in: https://doi.org/10.1371/journal.pone.0087357
   // Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357. 
   auto N = x.size() ;
-  ArrayXd x_scale = scale(x) ;
+  ArrayXd x_scale =  scale(x, !check_if_int(x)) ;
+ 
   // Make a kdtree for x_scale, it'll be needed later.
   kd_tree_1d xscale_index_tree(1, x_scale, 10);
   

@@ -40,8 +40,12 @@ double MutualInformation::compute(const ArrayXd &x, const ArrayXd& y) {
   auto N = x.size() ;
   
   Array2col  tmp_mat(N, 2) ;
-  tmp_mat.col(0) = scale(x) ;
-  tmp_mat.col(1) = y ;
+  // If not an integer valued array in double representation
+  // scale it. Either way add a bit of noise to avoid duplicate
+  // values.
+  tmp_mat.col(0) = scale(x, !check_if_int(x)) ;
+  tmp_mat.col(1) = scale(y, !check_if_int(y)) ;
+  
   // Map the double array pointer to an Eigen vector without a copy.
   MapArrayConst x_scale(tmp_mat.col(0).data(), N) ;
   MapArrayConst y_scale(tmp_mat.col(1).data(), N) ;

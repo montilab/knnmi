@@ -51,8 +51,11 @@ namespace CaDrA {
     protected:
         int m_k ;
         
-        // center & scale
-        virtual ArrayXd scale(const ArrayXd &x, const bool add_noise=true) const ;
+        // center & scale & add a bit of noise
+        virtual ArrayXd scale(const ArrayXd &x, const bool apply_scale=true, const bool add_noise=true) const ;
+        
+        // check if an array is made up of integers masquerading as doubles.
+        virtual bool check_if_int(const ArrayXd &x) ;
         
         // digamma function
         vector<double> digamma_vec(vector<double> counts) const ;

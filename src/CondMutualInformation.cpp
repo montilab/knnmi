@@ -41,9 +41,12 @@ double CondMutualInformation::compute(const ArrayXd &x, const ArrayXd& y, const 
   
   Array3col tmp_mat(N, 3) ;
   
-  tmp_mat.col(0) = scale(x) ;
-  tmp_mat.col(1) = y ;  
-  tmp_mat.col(2) = z ;
+  // If not an integer valued array in double representation
+  // scale it. Either way add a bit of noise to avoid duplicate
+  // values.
+  tmp_mat.col(0) = scale(x, !check_if_int(x)) ;
+  tmp_mat.col(1) = scale(y, !check_if_int(y)) ;
+  tmp_mat.col(2) = scale(z, !check_if_int(z)) ;
   
   // Calculating the distances also calculates the number of neighbors, so
   // calc_distances2 returns both.

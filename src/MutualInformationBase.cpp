@@ -6,10 +6,8 @@
 #include <cmath>
 #include <array>
 #include <numeric>
-#include <functional>
-#include <list>
-#include <set>
-#include <map>
+#include <limits> 
+#include <cstdint> 
 
 #include <Rmath.h>
 #include "R.h"
@@ -39,27 +37,46 @@ void MutualInformationBase::set_k(int mK) {
 }
  
 
-ArrayXd MutualInformationBase::scale(const ArrayXd &x, const bool add_noise) const {
-  // Center and scale the vector x by its standard deviation. Add a bit of random 
+ArrayXd MutualInformationBase::scale(const ArrayXd &x, const bool apply_scale, const bool add_noise) const {
+  // Scale the vector x by its standard deviation. Add a bit of random 
   // noise.
-  auto size_v = x.size() ;
-  double mean_x = x.mean() ; 
-  
-  ArrayXd x_scale = x - mean_x ;
-  double std_dev = std::sqrt(x_scale.pow(2).sum() / (size_v-1)) ;
-  
-  x_scale = x_scale  / std_dev ; 
-  
+  ArrayXd x_scale = x ;
+  double mean_x ; 
+  auto size_x = x.size() ;
+  if (apply_scale) {
+    double std_dev = std::sqrt(x_scale.pow(2).sum() / (size_x - 1)) ;
+    x_scale = x_scale  / std_dev ; 
+  }  
   // add a wee bit of noise as suggested in
   // Kraskov et. al. 2004.
   if (add_noise) {
     // Get a uniform value from the R RNG
     // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
-    for (auto i = 0 ; i < x.size() ; i++) {
+    mean_x = x_scale.mean() ;
+    for (auto i = 0 ; i < size_x ; i++) {
       x_scale[i] += 1e-10 * mean_x * unif_rand();
     }
   }
   return x_scale;
+}
+
+bool MutualInformationBase::check_if_int(const ArrayXd &x) {
+  // check if an array is made up of integers masquerading as doubles.
+  // This is used as a decision as to whether or not to center & scale
+  // the array.
+  
+  // Cast each element of the array to a long integer. Subtract 
+  // from x. If at any point the difference is greater than the 
+  // double-prec eps return false. Otherwise return true. This
+  // will quit immediately if a non-integer value is found.
+  auto eps = std::numeric_limits<double>::epsilon() ;
+  for (long i = 0 ; i < x.size() ; ++i) {
+    auto val = static_cast<std::int64_t>(x[i]) ; 
+    if ((x[i] - val) > eps) {
+      return false ;
+    }
+  }
+  return true ;
 }
 
  
