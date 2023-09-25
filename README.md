@@ -32,3 +32,6 @@ set.seed(654321)
 mi <- mutual_inf_cc(X,Y)
 ```
 There is no parallelism implemented in this library. Parallel computations can be implemented in R code calling the knnmi library functions. 
+
+# TODO
+Add some examples, and some comparison calculations (including timing info as this is faster) with scikit-learn. 
