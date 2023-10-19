@@ -10,13 +10,14 @@ The k-nearest neighbor (KNN) approach to mutual information (MI) is used in popu
 [scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_regression.html#sklearn.feature_selection.mutual_info_regression) 
 for Python. 
 Here, the KNN computations are handled by the high performance [nanoflann](https://github.com/jlblancoc/nanoflann) C++ library with the addition of a custom Chebyshev distance metric. The Eigen C++ library is used to handle vectors and an effort was made to minimize the number of copies of the incoming data from R to preserve memory. 
-A newer Eigen version (3.4.0) was used for some useful features and a minimal copy of that library is part of this repository. The newest Eigen version built 
-into RcppEigen is 3.3.4. 
+A newer Eigen version (3.4.0) was used for some useful features and a minimal copy of that library is part of this repository. These features are not available in the 3.3.4 version of Eigen built into RcppEigen. 
 
 The publications used as the basis for the knnmi library are:
 * mutual_inf_cc - [A. Kraskov, H. Stögbauer, and P. Grassberger, Phys. Rev. E 69, 066138 (2004)](https://doi.org/10.1103/PhysRevE.69.066138)
 * mutual_inf_cd - [Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357](https://doi.org/10.1371/journal.pone.0087357)
 * cond_mutual_inf - [A. Tsimpiris, I. Vlachos, and D. Kugiumtzis. Expert Systems with Applications, Volume 39, Issue 16, (2012)](https://doi.org/10.1016/j.eswa.2012.05.014)
+
+The knnmi code matches the results of the sample code provided with those publications and the implementation in the Python sklearn library to 4-5 decimal places. 
 
 # Calling knnmi functions 
 `mutual_inf_cc <- function(target, features, k=3L)` The target and features inputs should both be continuous. If the length of the target vector is (N) the dimensions of the features must be N or if it's a matrix MxN. The size of the neighborhood (k) can be changed but should probably be in the range of 2-5 (for more on this range see Kraskov, et.al. 2004).  The target and features vectors are scaled by their standard deviation and a small amount of random noise is added (with a magnitude of <1e-12) if they are continuous values.  If they are not actually continuous but are actually discrete numeric values the scaling and added noise are skipped. Discrete features should be used with the `mutual_inf_cd` function as it is approximately 2x faster. If the features variable is a matrix of size MxN the code will loop over the rows and the output MI will be a vector of size M.
