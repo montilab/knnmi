@@ -179,7 +179,6 @@ SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, S
   double *p_buf_y, *p_buf_z ;
   int i, j ;
   double *p_x, *p_y, *p_z ;
-  char err_msg[256] ;
   
   /* In the R wrapper make sure k is passed as an integer. */
   k_value = INTEGER(k)[0] ;
@@ -198,11 +197,6 @@ SEXP _cond_mutual_inf( SEXP r_input_x, SEXP r_input_y, SEXP r_input_z, SEXP k, S
    *  to temporary buffers where needed. 
    * In the R wrapper make sure case_ is passed as an integer. */
   case_value = INTEGER(case_)[0] ;
-  /* Check to make sure this is in a valid range */
-  if (case_value < 0 || case_value > 3) {
-    sprintf(err_msg, "value of case argument must be in the range 0-3. Value given: %d", case_value) ;
-    error(err_msg) ;
-  };
 
   /* Get C pointers to the R data */
   p_y = REAL(r_input_y) ;

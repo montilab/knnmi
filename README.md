@@ -3,7 +3,7 @@
 knnmi is a mutual information library for R based on the k-nearest neighbor algorithm. There are three functions:
 * mutual_inf_cc - Compute MI(X;Y) where X is a vector and Y is a vector or matrix. X and Y are both continuous.
 * mutual_inf_cd  - Compute MI(X;Y) where X is a vector and Y is a vector or matrix. X is continuous and Y contains discrete numeric values.
-* cond_mutual_inf - Compute the condtional mutual information CMI(X;Y|Z) where X is a continous vector. Y and Z are continous and be any mix of vectors and matrices.
+* cond_mutual_inf - Compute the conditional mutual information CMI(X;Y|Z) where X is a continuous vector. Y and Z are continuous and be any mix of vectors and matrices.
 
 # Implementation
 The k-nearest neighbor (KNN) approach to mutual information (MI) is used in popular libraries like 
