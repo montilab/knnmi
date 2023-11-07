@@ -7,7 +7,7 @@
 #'
 #' @references
 #' Alexander Kraskov, Harald Stögbauer, and Peter Grassberger. Phys. Rev. E **69**, 066138 (2004).
-#' \url{https://doi.org/10.1103/PhysRevE.69.066138}
+#' \doi{10.1103/PhysRevE.69.066138}
 #'
 #' @param target input vector of length N.
 #' @param features input vector of length N or a matrix of size MxN.
@@ -56,7 +56,7 @@ mutual_inf_cc <- function(target, features, k=3L){
 #'
 #' @references
 #' Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357. 
-#' \url{https://doi.org/10.1371/journal.pone.0087357}
+#' \doi{10.1371/journal.pone.0087357}
 #' 
 #' @param target input vector of length N.
 #' @param features input vector of length N or a matrix of size MxN.
@@ -113,7 +113,7 @@ mutual_inf_cd <- function(target, features, k=3L){
 #' Nearest neighbor estimate of conditional mutual information in feature selection,
 #' Expert Systems with Applications,
 #' Volume 39, Issue 16, 2012, Pages 12697-12708
-#' \url{https:doi.org/10.1016/j.eswa.2012.05.014}
+#' \doi{10.1016/j.eswa.2012.05.014}
 #' 
 #' @param X vector of size N.
 #' @param Y input vector of length N or a matrix of size NxM.

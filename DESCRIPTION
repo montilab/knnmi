@@ -1,23 +1,26 @@
 Package: knnmi
-Title: k-nearest neighbor mutual information estimator
-Version: 0.1
-Authors@R: 
-    c(person(given="Brian", family="Gregor", role=c("aut","cre"), 
-             email="bgregor@bu.edu", comment=c(ORCID="0009-0004-9640-0574")), 
-      person(given="Katia", family="Bulekova", role=c("aut"), 
-             email="ktrn@bu.edu", comment=c(ORCID="0000-0003-1560-2146")),
-      person(given="Reina", family="Chau", role=c("aut"),
-             email="rchau88@bu.edu", comment=c(ORCID="0000-0003-3012-1404")),
-      person(given="Stefano", family="Monti", role=c("aut"), 
-             email="smonti@bu.edu", comment=c(ORCID="0000-0002-9376-0660"))
-     )
+Title: k-Nearest Neighbor Mutual Information Estimator
+Version: 1.0
+Authors@R: c(
+    person("Brian", "Gregor", , "bgregor@bu.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0004-9640-0574")),
+    person("Katia", "Bulekova", , "ktrn@bu.edu", role = "aut",
+           comment = c(ORCID = "0000-0003-1560-2146")),
+    person("Reina", "Chau", , "rchau88@bu.edu", role = "aut",
+           comment = c(ORCID = "0000-0003-3012-1404")),
+    person("Stefano", "Monti", , "smonti@bu.edu", role = "aut",
+           comment = c(ORCID = "0000-0002-9376-0660"))
+  )
 Description: Estimates k-nearest neighbor mutual information.
-Depends: R (>= 4.1.0)
 License: GPL (>= 3)
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+Depends: 
+    R (>= 4.1.0)
 Suggests: 
+    spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Encoding: UTF-8
 LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Language: en-US
