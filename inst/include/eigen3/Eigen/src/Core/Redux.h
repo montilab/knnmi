@@ -70,10 +70,10 @@ public:
 #ifdef EIGEN_DEBUG_ASSIGN
   static void debug()
   {
-    std::cerr << "Xpr: " << typeid(typename Evaluator::XprType).name() << std::endl;
-    std::cerr.setf(std::ios::hex, std::ios::basefield);
+   // std::cerr << "Xpr: " << typeid(typename Evaluator::XprType).name() << std::endl;
+   // std::cerr.setf(std::ios::hex, std::ios::basefield);
     EIGEN_DEBUG_VAR(Evaluator::Flags)
-    std::cerr.unsetf(std::ios::hex);
+  //  std::cerr.unsetf(std::ios::hex);
     EIGEN_DEBUG_VAR(InnerMaxSize)
     EIGEN_DEBUG_VAR(OuterMaxSize)
     EIGEN_DEBUG_VAR(SliceVectorizedWork)
@@ -81,10 +81,10 @@ public:
     EIGEN_DEBUG_VAR(MightVectorize)
     EIGEN_DEBUG_VAR(MayLinearVectorize)
     EIGEN_DEBUG_VAR(MaySliceVectorize)
-    std::cerr << "Traversal" << " = " << Traversal << " (" << demangle_traversal(Traversal) << ")" << std::endl;
+  //  std::cerr << "Traversal" << " = " << Traversal << " (" << demangle_traversal(Traversal) << ")" << std::endl;
     EIGEN_DEBUG_VAR(UnrollingLimit)
-    std::cerr << "Unrolling" << " = " << Unrolling << " (" << demangle_unrolling(Unrolling) << ")" << std::endl;
-    std::cerr << std::endl;
+   // std::cerr << "Unrolling" << " = " << Unrolling << " (" << demangle_unrolling(Unrolling) << ")" << std::endl;
+   // std::cerr << std::endl;
   }
 #endif
 };

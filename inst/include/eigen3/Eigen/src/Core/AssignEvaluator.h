@@ -151,12 +151,12 @@ public:
 #ifdef EIGEN_DEBUG_ASSIGN
   static void debug()
   {
-    std::cerr << "DstXpr: " << typeid(typename DstEvaluator::XprType).name() << std::endl;
-    std::cerr << "SrcXpr: " << typeid(typename SrcEvaluator::XprType).name() << std::endl;
-    std::cerr.setf(std::ios::hex, std::ios::basefield);
-    std::cerr << "DstFlags" << " = " << DstFlags << " (" << demangle_flags(DstFlags) << " )" << std::endl;
-    std::cerr << "SrcFlags" << " = " << SrcFlags << " (" << demangle_flags(SrcFlags) << " )" << std::endl;
-    std::cerr.unsetf(std::ios::hex);
+    //std::cerr << "DstXpr: " << typeid(typename DstEvaluator::XprType).name() << std::endl;
+   // std::cerr << "SrcXpr: " << typeid(typename SrcEvaluator::XprType).name() << std::endl;
+   // std::cerr.setf(std::ios::hex, std::ios::basefield);
+   // std::cerr << "DstFlags" << " = " << DstFlags << " (" << demangle_flags(DstFlags) << " )" << std::endl;
+   // std::cerr << "SrcFlags" << " = " << SrcFlags << " (" << demangle_flags(SrcFlags) << " )" << std::endl;
+   // std::cerr.unsetf(std::ios::hex);
     EIGEN_DEBUG_VAR(DstAlignment)
     EIGEN_DEBUG_VAR(SrcAlignment)
     EIGEN_DEBUG_VAR(LinearRequiredAlignment)
@@ -173,15 +173,15 @@ public:
     EIGEN_DEBUG_VAR(MayInnerVectorize)
     EIGEN_DEBUG_VAR(MayLinearVectorize)
     EIGEN_DEBUG_VAR(MaySliceVectorize)
-    std::cerr << "Traversal" << " = " << Traversal << " (" << demangle_traversal(Traversal) << ")" << std::endl;
+   // std::cerr << "Traversal" << " = " << Traversal << " (" << demangle_traversal(Traversal) << ")" << std::endl;
     EIGEN_DEBUG_VAR(SrcEvaluator::CoeffReadCost)
     EIGEN_DEBUG_VAR(DstEvaluator::CoeffReadCost)
     EIGEN_DEBUG_VAR(Dst::SizeAtCompileTime)
     EIGEN_DEBUG_VAR(UnrollingLimit)
     EIGEN_DEBUG_VAR(MayUnrollCompletely)
     EIGEN_DEBUG_VAR(MayUnrollInner)
-    std::cerr << "Unrolling" << " = " << Unrolling << " (" << demangle_unrolling(Unrolling) << ")" << std::endl;
-    std::cerr << std::endl;
+   // std::cerr << "Unrolling" << " = " << Unrolling << " (" << demangle_unrolling(Unrolling) << ")" << std::endl;
+   // std::cerr << std::endl;
   }
 #endif
 };

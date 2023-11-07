@@ -895,7 +895,8 @@
 //   std::max EIGEN_NOT_A_MACRO(a,b)
 #define EIGEN_NOT_A_MACRO
 
-#define EIGEN_DEBUG_VAR(x) std::cerr << #x << " = " << x << std::endl;
+#define EIGEN_DEBUG_VAR(x) 
+//std::cerr << #x << " = " << x << std::endl;
 
 // concatenate two tokens
 #define EIGEN_CAT2(a,b) a ## b
@@ -1019,7 +1020,7 @@
     }
     inline void assert_fail(const char *condition, const char *function, const char *file, int line)
     {
-      std::cerr << "assertion failed: " << condition << " in function " << function << " at " << file << ":" << line << std::endl;
+      //std::cerr << "assertion failed: " << condition << " in function " << function << " at " << file << ":" << line << std::endl;
       abort();
     }
     }

@@ -37,7 +37,7 @@ namespace internal {
   static bool firstTime = true;                                                     \
   do {                                                                              \
     if (firstTime) {                                                                \
-      std::cout << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl; \
+      //std::cout << __FILE__ << ':' << __LINE__ << ':' << __FUNCTION__ << std::endl; \
       firstTime = false;                                                            \
     }                                                                               \
   } while (0)
