@@ -5,7 +5,7 @@ knnmi is a mutual information (MI) library for R based on the k-nearest neighbor
 * `mutual_inf_cd`  - Compute MI(X;Y) where X is a vector and Y is a vector or matrix. X is continuous and Y contains discrete numeric values.
 * `cond_mutual_inf` - Compute the conditional mutual information CMI(X;Y|Z) where X is a continuous vector. Y and Z are continuous and be any combination of vectors and matrices.
 
-The KNN approach to mutual information has been compared to approaches based on kernel density estimation (KDE). The KNN approach was determined to perform better for data sets of 1000 sample points or greater at all noise levels, and for small data sets (<= 100 points) at low noise levels. The KDE MI algorithm was the better choice for small data sets with high noise levels. For more details, please refer to this paper: [S. Khan, S. Bandyopadhyay, A. R. Ganguly, S. Saigal, D. J. Erickson, III, V. Protopopescu, and G. Ostrouchov
+The KNN approach to mutual information has been compared to approaches based on kernel density estimation (KDE). The KNN approach was determined to perform better for data sets of 1000 sample points or greater at all noise levels, and for small data sets (≤ 100 points) at low noise levels. The KDE MI algorithm was the better choice for small data sets with high noise levels. For more details, please refer to this paper: [S. Khan, S. Bandyopadhyay, A. R. Ganguly, S. Saigal, D. J. Erickson, III, V. Protopopescu, and G. Ostrouchov
 Phys. Rev. E 76, 026209 (2007)](https://link.aps.org/doi/10.1103/PhysRevE.76.026209)
 
 
