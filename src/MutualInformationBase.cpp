@@ -51,8 +51,8 @@ ArrayXd MutualInformationBase::scale(const ArrayXd &x, const bool apply_scale, c
   // Kraskov et. al. 2004. For the CaDrA package the suggested value
   // of 1e-10 seems too high and leads to too much variance in the MI
   // calculation. The point of the noise is to avoid points too close
-  // together which may lead to an accidentally double-counting.  
-  // Trying 1e-12
+  // together which may lead to accidentally double-counting them.
+  // Trying 1e-12 which seems ok.
   if (add_noise) {
     // Get a uniform value from the R RNG
     // https://cran.r-project.org/doc/manuals/R-exts.html#Random-numbers
