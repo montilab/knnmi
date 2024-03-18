@@ -14,7 +14,9 @@ mutual_inf_cc(target, features, k = 3L)
 \item{k}{Integer number of nearest neighbors. The default value is 3.}
 }
 \value{
-The estimated mutual information.
+Returns the estimated mutual information. The return value is a vector of size 1 if the features argument
+is a vector. If the features argument is a matrix then the return value is a vector whose size matches the
+number of rows in the matrix.
 }
 \description{
 Estimate the mutual information MI(X;Y) of the target \code{X} and features \code{Y}
@@ -23,9 +25,6 @@ where \code{X} and \code{Y} are both continuous using k-nearest neighbor distanc
 \details{
 The features argument is a vector of the same size as the target vector, or a matrix whose column dimension matches
 the size of the target vector.
-
-The return value is a vector of size 1 if the features argument is a vector. If the featurs argument is a matrix
-then the return value is a vector whose size matches the number of rows in the matrix.
 }
 \examples{
 

@@ -17,13 +17,11 @@
 #' The features argument is a vector of the same size as the target vector, or a matrix whose column dimension matches
 #' the size of the target vector. 
 #' 
-#' The return value is a vector of size 1 if the features argument is a vector. If the featurs argument is a matrix 
-#' then the return value is a vector whose size matches the number of rows in the matrix.
-#' 
-#' 
 #' @useDynLib knnmi _mutual_inf_cc
 #'
-#' @return The estimated mutual information.
+#' @return Returns the estimated mutual information. The return value is a vector of size 1 if the features argument 
+#' is a vector. If the features argument is a matrix then the return value is a vector whose size matches the 
+#' number of rows in the matrix.
 #' 
 #' @examples
 #'
@@ -68,12 +66,19 @@ mutual_inf_cc <- function(target, features, k=3L){
 #' Ross BC (2014) Mutual Information between Discrete and Continuous Data Sets. PLoS ONE 9(2): e87357. 
 #' \doi{10.1371/journal.pone.0087357}
 #' 
-#' @param target input vector of length N.
-#' @param features input vector of length N or a matrix of size MxN.
-#' @param k number of nearest neighbors.
+#' @param target input vector.
+#' @param features input vector or matrix. 
+#' @param k Integer number of nearest neighbors. The default value is 3.
+#' 
+#' @details
+#' The features argument is a vector of the same size as the target vector, or a matrix whose column dimension matches
+#' the size of the target vector. Discrete values for the features or targets must be numeric or integer types.
+#' 
 #' @useDynLib knnmi _mutual_inf_cd
 #'
-#' @return The estimated mutual information as a double-precision vector of length N.
+#' @return Returns the estimated mutual information. The return value is a vector of size 1 if the features argument is 
+#' a vector. If the features argument is a matrix then the return value is a vector whose size matches the 
+#' number of rows in the matrix.
 #'
 #' @examples
 #'
@@ -125,13 +130,23 @@ mutual_inf_cd <- function(target, features, k=3L){
 #' Volume 39, Issue 16, 2012, Pages 12697-12708
 #' \doi{10.1016/j.eswa.2012.05.014}
 #' 
-#' @param X vector of size N.
-#' @param Y input vector of length N or a matrix of size NxM.
-#' @param Z conditional input vector of length N or a matrix of size NxM.
+#' @param X input vector.
+#' @param Y input vector or matrix.
+#' @param Z conditional input vector or matrix.
 #' @param k number of nearest neighbors.
+#' 
+#' 
+#' @details
+#' Argument Y is a vector of the same size as vector X, or a matrix whose column dimension matches
+#' the size of X.  Argument Z is also a vector of the same size as vector X, or a matrix whose column dimension matches
+#' the size of X. If Y and Z are both matrices they must additionally have the same number of rows.  If Y and/or Z are
+#' discrete values they must have a numeric or integer type. 
+#' 
 #' @useDynLib knnmi _cond_mutual_inf
 #'
-#' @return The estimated conditional mutual information as a double-precision vector of length N.
+#' @return Returns the estimated conditional mutual information. The return value is a vector of size 1 if both Y and Z 
+#' are vectors. If either Y or Z are matrices the return value is a vector whose size is the number of rows in the 
+#' matrix.
 #'
 #' @examples
 #' data(mutual_info_df)

@@ -7,21 +7,29 @@
 cond_mutual_inf(X, Y, Z, k = 3L)
 }
 \arguments{
-\item{X}{vector of size N.}
+\item{X}{input vector.}
 
-\item{Y}{input vector of length N or a matrix of size NxM.}
+\item{Y}{input vector or matrix.}
 
-\item{Z}{conditional input vector of length N or a matrix of size NxM.}
+\item{Z}{conditional input vector or matrix.}
 
 \item{k}{number of nearest neighbors.}
 }
 \value{
-The estimated conditional mutual information as a double-precision vector of length N.
+Returns the estimated conditional mutual information. The return value is a vector of size 1 if both Y and Z
+are vectors. If either Y or Z are matrices the return value is a vector whose size is the number of rows in the
+matrix.
 }
 \description{
 Conditional mutual information estimation CMI(X;Y|Z) where X is a continuous vector.
 The input Y and conditional input Z can be vectors or matrices. If Y and Z
 are discrete then they must be numeric or integer valued.
+}
+\details{
+Argument Y is a vector of the same size as vector X, or a matrix whose column dimension matches
+the size of X.  Argument Z is also a vector of the same size as vector X, or a matrix whose column dimension matches
+the size of X. If Y and Z are both matrices they must additionally have the same number of rows.  If Y and/or Z are
+discrete values they must have a numeric or integer type.
 }
 \examples{
 data(mutual_info_df)

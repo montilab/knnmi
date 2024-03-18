@@ -7,18 +7,24 @@
 mutual_inf_cd(target, features, k = 3L)
 }
 \arguments{
-\item{target}{input vector of length N.}
+\item{target}{input vector.}
 
-\item{features}{input vector of length N or a matrix of size MxN.}
+\item{features}{input vector or matrix.}
 
-\item{k}{number of nearest neighbors.}
+\item{k}{Integer number of nearest neighbors. The default value is 3.}
 }
 \value{
-The estimated mutual information as a double-precision vector of length N.
+Returns the estimated mutual information. The return value is a vector of size 1 if the features argument is
+a vector. If the features argument is a matrix then the return value is a vector whose size matches the
+number of rows in the matrix.
 }
 \description{
 Estimate the mutual information MI(X;Y) of the target \code{X} and features \code{Y}
 where \code{X} is continuous or discrete and \code{Y} is discrete using k-nearest neighbor distances.
+}
+\details{
+The features argument is a vector of the same size as the target vector, or a matrix whose column dimension matches
+the size of the target vector. Discrete values for the features or targets must be numeric or integer types.
 }
 \examples{
 
