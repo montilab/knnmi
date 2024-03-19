@@ -11,7 +11,7 @@ Authors@R: c(
     person("Stefano", "Monti", , "smonti@bu.edu", role = "aut",
            comment = c(ORCID = "0000-0002-9376-0660"))
   )
-Description: Estimates k-nearest neighbor mutual information.
+Description: Estimates mutual information and conditional mutual information using k-nearest neighbors.
 License: GPL (>= 3)
 Depends: 
     R (>= 4.1.0)
