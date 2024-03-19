@@ -20,7 +20,7 @@ Phys. Rev. E 76, 026209 (2007)](https://link.aps.org/doi/10.1103/PhysRevE.76.026
 
 
 # Implementation
-The k-nearest neighbor (KNN) approach to mutual information (MI) is a well estabished technique, and this library uses a C++ implementation for performance. The KNN computations are handled by the high performance [nanoflann](https://github.com/jlblancoc/nanoflann) C++ library with the addition of a custom Chebyshev distance metric. The [Eigen C++ library](https://eigen.tuxfamily.org) is used to handle vectors and an effort was made to minimize the number of copies of the incoming data from R to preserve memory. 
+The k-nearest neighbor (KNN) approach to mutual information (MI) is a well estabished technique, and this library uses a C++ implementation for performance. The KNN computations are handled by the high performance [nanoflann](https://github.com/jlblancoc/nanoflann) C++ library with the addition of a custom Chebyshev distance metric. The [Eigen C++ library](https://eigen.tuxfamily.org/index.php?title=Main_Page) is used to handle vectors and an effort was made to minimize the number of copies of the incoming data from R to preserve memory. 
 
 A newer Eigen version (3.4.0) was used for some useful features and a minimal copy of that library is part of this repository. This approach was taken as these features are not available in the 3.3.4 version of Eigen which is built into the  version of RcppEigen that was available when this library was developed. 
 
