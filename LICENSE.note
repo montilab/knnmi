@@ -1,0 +1,6 @@
+The knnmi package as a whole is distributed under the GPL (version >=3). The knnmi package includes other open source software components. The following is a list of these components:
+
+* eigen: MPL
+* nanoflann: BSD
+
+Full copies of the license agreements used by these components are included in `inst/licenses`.

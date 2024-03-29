@@ -2,16 +2,19 @@ Package: knnmi
 Title: k-Nearest Neighbor Mutual Information Estimator
 Version: 1.0
 Authors@R: c(
-    person("Brian", "Gregor", , "bgregor@bu.edu", role = c("aut", "cre"),
+    person("Brian", "Gregor", email="bgregor@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0004-9640-0574")),
-    person("Katia", "Bulekova", , "ktrn@bu.edu", role = "aut",
+    person("Katia", "Bulekova", email="ktrn@bu.edu", role = "aut",
            comment = c(ORCID = "0000-0003-1560-2146")),
-    person("Reina", "Chau", , "rchau88@bu.edu", role = "aut",
+    person("Reina", "Chau", email="rchau88@bu.edu", role = "aut",
            comment = c(ORCID = "0000-0003-3012-1404")),
-    person("Stefano", "Monti", , "smonti@bu.edu", role = "aut",
-           comment = c(ORCID = "0000-0002-9376-0660"))
-  )
-Description: knnmi is a C++ mutual information (MI) library based on the k-nearest 
+    person("Stefano", "Monti",  email="smonti@bu.edu", role = "aut",
+           comment = c(ORCID = "0000-0002-9376-0660")),
+    person("Benoit", "Jacob", role="cph", comment="Author of included Eigen library"),
+    person("Gael", "Guennebaud", role="cph", comment="Author of included Eigen library"),
+    person(c("Jose", "Luis"), "Blanco", role="cph", comment="Author of included nanoflann library"),
+    person(c("Pranjal", "Kumar"),  "Rai", role="cph", comment="Author of included nanoflann library"))
+Description: This is a 'C++' mutual information (MI) library based on the k-nearest 
     neighbor (KNN) algorithm. There are three functions provided for computing MI 
     for continuous values, mixed continuous and discrete values, and conditional MI 
     for continuous values. They are based on algorithms by A. Kraskov, et. al. (2004) <doi:10.1103/PhysRevE.69.066138>, 
